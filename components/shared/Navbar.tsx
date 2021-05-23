@@ -2,19 +2,8 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  Text,
-  Spacer,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Avatar,
-  Flex,
-} from "@chakra-ui/react";
-import { useAuth } from "../hooks/useFirebaseUser";
+import { Box, Spacer, Button, Menu, MenuButton, MenuList, MenuItem, Avatar, Flex } from "@chakra-ui/react";
+import { useAuth } from "../../hooks/useAuth";
 
 const NavBar = () => {
   const auth = useAuth();
@@ -41,8 +30,8 @@ const NavBar = () => {
         <Menu>
           <MenuButton mr="3" py="1" px="2" height="fit-content" as={Button} rightIcon={<ChevronDownIcon />}>
             <Flex flexDirection="row" alignItems="center">
-              <Avatar mr="3" name={auth.user.displayName} src={auth.user.imgUrl} />
-              {auth.user.username}
+              <Avatar mr="3" size="sm" name={auth.user.displayName} src={auth.user.photoURL} />
+              {auth.user.displayName}
             </Flex>
           </MenuButton>
           <MenuList>

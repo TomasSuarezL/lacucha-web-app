@@ -3,18 +3,18 @@ import Link from "next/link";
 import { Stack, Link as ChakraLink } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { AiOutlineTeam, AiOutlineCalendar, AiOutlineBarChart, AiOutlineSetting } from "react-icons/ai";
-import { useAuth } from "../hooks/useFirebaseUser";
+import { useRouter } from "next/router";
 
 export default function NavBar() {
-  const auth = useAuth();
-
+  const router = useRouter();
   return (
     <Stack
       direction={["row", "column"]}
       display="flex"
       alignItems={["center", "flex-start"]}
       justifyContent={["center", "flex-start"]}
-      p={[4, 8]}
+      px={[4, 6, 6, 6, 16]}
+      py={[4, 16]}
       minWidth={[null, null, "2xs", "2xs"]}
       spacing={["8px", "24px"]}
     >
@@ -27,6 +27,7 @@ export default function NavBar() {
           _hover={{ bg: "gray.200" }}
           p={[0, 4]}
           w="full"
+          bg={router.asPath === "/usuarios" && "gray.100"}
         >
           <Icon as={AiOutlineTeam} w={["4", "6"]} h={["4", "6"]} mr={["2", "5"]}></Icon>Usuarios
         </ChakraLink>
@@ -40,6 +41,7 @@ export default function NavBar() {
           _hover={{ bg: "gray.200" }}
           p={[0, 4]}
           w="full"
+          bg={router.asPath === "/mesociclos" && "gray.100"}
         >
           <Icon as={AiOutlineCalendar} w={["4", "6"]} h={["4", "6"]} mr={["2", "5"]}></Icon>Mesociclos
         </ChakraLink>
@@ -53,6 +55,7 @@ export default function NavBar() {
           _hover={{ bg: "gray.200" }}
           p={[0, 4]}
           w="full"
+          bg={router.asPath === "/dashboard" && "gray.100"}
         >
           <Icon as={AiOutlineBarChart} w={["4", "6"]} h={["4", "6"]} mr={["2", "5"]}></Icon>Dashboard
         </ChakraLink>
@@ -66,6 +69,7 @@ export default function NavBar() {
           _hover={{ bg: "gray.200" }}
           p={[0, 4]}
           w="full"
+          bg={router.asPath === "/configuracion" && "gray.100"}
         >
           <Icon as={AiOutlineSetting} w={["4", "6"]} h={["4", "6"]} mr={["2", "5"]}></Icon>Configuración
         </ChakraLink>

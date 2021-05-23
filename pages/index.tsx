@@ -1,16 +1,15 @@
 import { Box, Text, Spacer, Heading, Progress, Flex, Avatar, Container, Stack } from "@chakra-ui/react";
 import React from "react";
-import { useAuth } from "../hooks/useFirebaseUser";
-import Layout from "../components/Layout";
-import DataField from "../components/DataField";
+import { useAuth } from "../hooks/useAuth";
+import Layout from "../components/shared/Layout";
+import DataField from "../components/shared/DataField";
+import { User } from "../types/Usuario.type";
 
 export default function Perfil() {
   const auth = useAuth();
 
   const UserData = () => {
-    const {
-      user: { email, uid, username, nombre, apellido, imgUrl, peso, altura, genero, nivel },
-    } = auth;
+    const { email, uid, username, nombre, apellido, imgUrl, peso, altura, genero, nivel } = auth.user as User;
     return (
       <Flex direction="column" align="center" w="full" boxShadow="xl" p={["4", "6"]} bg="white">
         <Avatar size="2xl" name={nombre} src={imgUrl}></Avatar>
@@ -33,16 +32,12 @@ export default function Perfil() {
 
   return (
     <Layout>
-      {auth.loading ? (
-        <Progress position="absolute" top="0" width="full" size="xs" isIndeterminate />
-      ) : (
-        auth.user && (
-          <Box as="main" w="full">
-            <UserData />
-          </Box>
-        )
+      {auth.user && (
+        <Box as="main" w="full">
+          <UserData />
+        </Box>
       )}
-      <footer></footer>
     </Layout>
   );
 }
+6;

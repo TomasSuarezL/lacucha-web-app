@@ -12,7 +12,14 @@ const DataField: React.FC<DataFieldProps> = ({ value, label }) => {
       <Text fontSize={["xs", "sm"]} width={["full", "full"]} fontWeight="bold">
         {label}
       </Text>
-      <Text fontSize={["sm", "lg"]} width={["full", "full"]} fontWeight="medium" bg="gray.100" p="3">
+      <Text
+        fontSize={["sm", "lg"]}
+        width={["full", "full"]}
+        fontWeight="normal"
+        bg="gray.100"
+        px={[1, 2]}
+        p={1}
+      >
         {value}
       </Text>
     </Flex>
