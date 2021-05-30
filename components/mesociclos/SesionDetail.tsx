@@ -1,14 +1,12 @@
-import { Button, Divider, Flex, Spacer, Stack, Text } from "@chakra-ui/react";
 import { useImmer } from "use-immer";
 import React, { useState } from "react";
 import { AiFillEdit, AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
+import { Button, Divider, Flex, Spacer, Spinner, Stack, Text } from "@chakra-ui/react";
 import { Bloque, EjerciciosXBloque, Sesion } from "../../models/Mesociclo";
 import DataField from "../shared/DataField";
 import EjercicioSelectModal from "./EjercicioSelectModal";
 import { DeleteButton, SaveButton } from "../shared/Buttons";
-import { NumberInputLabeled } from "../shared/Inputs";
-import { useMutation } from "react-query";
-import { sesionesApi } from "./Sesion.api";
+import { DatePickerLabeled, NumberInputLabeled } from "../shared/Inputs";
 
 interface BloqueDetailProps {
   bloque: Bloque;
@@ -56,7 +54,7 @@ const BloqueDetail: React.FC<BloqueDetailProps> = ({
   };
 
   return (
-    <Flex direction="column" m={[1, 2, 3]}>
+    <Flex direction="column" my={[1, 2, 3]}>
       <Flex role="group" direction={["column", "row"]} bg="gray.200" p={[1, 2]} align="center">
         <Text fontSize={["xs", "sm"]} fontWeight="bold">{`Bloque: ${bloque.numBloque}`}</Text>
         <Spacer></Spacer>
@@ -153,22 +151,29 @@ const BloqueDetail: React.FC<BloqueDetailProps> = ({
 
 interface SesionDetailProps {
   sesion: Sesion;
-  updateSesion: (sesion: Sesion) => void;
+  onSave: (sesion: Sesion) => void;
+  onDelete?: (sesion: Sesion) => void;
+  isLoading: Boolean;
+  isNew: Boolean;
+  isReadOnly?: boolean;
 }
 
-export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion }) => {
-  const mutation = useMutation(
-    (sesion: Sesion) => {
-      if (sesion.idSesion) return sesionesApi.putSesion(sesion);
-      else return sesionesApi.postSesion(sesion);
-    },
-    {
-      onSuccess: (data) => {
-        updateSesion(data);
-      },
-    }
-  );
+export const SesionDetail: React.FC<SesionDetailProps> = ({
+  sesion,
+  onSave,
+  onDelete,
+  isLoading,
+  isNew,
+  isReadOnly = false,
+}) => {
   const [sesionEdit, setSesionEdit] = useImmer<Sesion>(sesion);
+
+  const onSesionFechaEmpezadoChange = (fechaEmpezado: Date) => {
+    setSesionEdit((draft) => {
+      fechaEmpezado.setUTCHours(12);
+      draft.fechaEmpezado = fechaEmpezado;
+    });
+  };
 
   const onEjercicioEdit = (numBloque: number, numEjercicio: number, ejercicio: EjerciciosXBloque) => {
     setSesionEdit((draft) => {
@@ -189,11 +194,11 @@ export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion
 
   const onBloqueAdd = () => {
     setSesionEdit((draft) => {
-      draft.bloques.push({ numBloque: sesionEdit.bloques.length + 1, ejercicios: [] } as Bloque);
+      draft.bloques.push({ numBloque: sesionEdit.bloques.length + 1, series: 3, ejercicios: [] } as Bloque);
     });
   };
 
-  const onBloqueDelete = (numBloque) => {
+  const onBloqueDelete = (numBloque: number) => {
     setSesionEdit((draft) => {
       draft.bloques = draft.bloques
         .filter((b) => b.numBloque != numBloque)
@@ -201,21 +206,22 @@ export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion
     });
   };
 
-  const onFinalizarSesion = () => {
+  const onSesionFinalizar = () => {
     sesion.finalizar();
-    mutation.mutate(sesion);
+    onSave(sesion);
   };
 
-  const finalizada = sesionEdit.estaFinalizada();
-
-  console.log(sesion);
+  const editable = !sesionEdit.estaFinalizada() && !isReadOnly;
 
   return (
-    <Flex direction="column">
-      <Text fontSize={["lg", "xl"]} fontWeight="bold" mx={[2, 2, 4]} alignSelf="flex-start">
-        {`Sesion del ${new Date(sesionEdit.fechaEmpezado).toLocaleString()}`}
-      </Text>
-      <Stack direction={["column", "column", "row"]} m={[2, 2, 4]} spacing={["2", "3"]}>
+    <Flex direction="column" mx={[2, 2, 4]}>
+      <DatePickerLabeled
+        dateValue={sesionEdit.fechaEmpezado || new Date()}
+        label="Sesión del"
+        onChange={(e) => onSesionFechaEmpezadoChange(e.target.valueAsDate)}
+      />
+      <Spacer p={[1]} />
+      <Stack direction={["column", "column", "row"]} spacing={["2", "3"]}>
         <DataField value={sesionEdit.fechaFinalizado ? "Terminada" : "Pendiente"} label="Estado" />
         {sesionEdit.fechaFinalizado && (
           <DataField
@@ -228,6 +234,7 @@ export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion
           />
         )}
       </Stack>
+      <Spacer p={[1]} />
       <Divider my={[1, 2]} />
       <Text fontSize={["lg", "xl"]} mx={[2, 2, 4]} alignSelf="flex-start">
         Bloques
@@ -240,7 +247,7 @@ export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion
             onBloqueEdit={onBloqueEdit}
             onBloqueDelete={onBloqueDelete}
             onEjercicioEdit={onEjercicioEdit}
-            editable={!finalizada}
+            editable={editable}
           />
         ))}
       </Flex>
@@ -251,26 +258,25 @@ export const SesionDetail: React.FC<SesionDetailProps> = ({ sesion, updateSesion
           _hover={{ bg: "gray.300" }}
           size="sm"
           onClick={() => onBloqueAdd()}
-          disabled={finalizada}
+          disabled={!editable}
         >
           <AiOutlinePlus /> Agregar Bloque
         </Button>
       </Flex>
       <Spacer m={[1, 2]} />
-      {!finalizada && (
-        <Flex>
-          <SaveButton
-            onClick={() => mutation.mutate(sesionEdit)}
-            isLoading={mutation.isLoading}
-            loadingText="Guardando"
-          >
-            Guardar Sesión
-          </SaveButton>
-          {!mutation.isLoading && (
-            <DeleteButton onClick={() => onFinalizarSesion()}>Finalizar Sesión</DeleteButton>
-          )}
-        </Flex>
-      )}
+      {editable &&
+        (isLoading ? (
+          <Flex w="full" justify="center">
+            <Spinner />
+          </Flex>
+        ) : (
+          <Flex>
+            <SaveButton onClick={() => onSave(sesionEdit)}>Guardar Sesión</SaveButton>
+            {!isNew && <DeleteButton onClick={() => onSesionFinalizar()}>Finalizar Sesión</DeleteButton>}
+            <Spacer />
+            {!isNew && <DeleteButton onClick={() => onDelete(sesionEdit)}>Eliminar Sesión</DeleteButton>}
+          </Flex>
+        ))}
     </Flex>
   );
 };

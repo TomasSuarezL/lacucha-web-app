@@ -11,4 +11,8 @@ export const sesionesApi = {
     const { data } = await api.post<Sesion>(`/sesiones`, sesion);
     return plainToClass(Sesion, data);
   },
+  deleteSesion: async (idSesion: number) => {
+    const { data } = await api.delete<Boolean>(`/sesiones/${idSesion}`);
+    return data;
+  },
 };

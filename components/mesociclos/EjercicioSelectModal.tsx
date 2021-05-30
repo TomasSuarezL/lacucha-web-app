@@ -13,11 +13,9 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useQueryCache } from "../../hooks/useQueryCache";
-import { Ejercicio, EjerciciosXBloque } from "../../models/Mesociclo";
+import { Ejercicio, EjerciciosXBloque, PatronesMovimiento } from "../../models/Mesociclo";
 import { NumberInputLabeled, SelectLabeled } from "../shared/Inputs";
 import { ejerciciosApi } from "./Ejercicios.api";
-
-const PatronesMovimiento = ["Empuje", "Traccion", "Rodilla", "Cadera", "Core"];
 
 interface EjercicioSelectModalProps {
   ejercicio: EjerciciosXBloque;
@@ -30,13 +28,18 @@ const EjercicioSelectModal: React.FC<EjercicioSelectModalProps> = ({ ejercicio, 
   const [patron, setPatron] = useState(ejercicio.ejercicio?.patron || "Empuje");
   const { data, isLoading, isError, error, isSuccess } = useQueryCache<Ejercicio[]>(
     ["ejercicios", patron],
-    () => ejerciciosApi.getEjercicios(patron),
-    { onSuccess: (data) => setEjercicioEdit({ ...ejercicioEdit, ejercicio: data[0] }) }
+    () => ejerciciosApi.getEjercicios(patron)
   );
 
   useEffect(() => {
-    isSuccess && setEjercicioEdit({ ...ejercicioEdit, ejercicio: data[0] });
-  }, []);
+    isSuccess &&
+      setEjercicioEdit({
+        ...ejercicioEdit,
+        ejercicio: data[0],
+        repeticiones: ejercicioEdit.repeticiones || 6,
+        carga: ejercicioEdit.carga || 0,
+      });
+  }, [data]);
 
   const onChangeEjercicio = (key: string, value: Ejercicio | number) => {
     setEjercicioEdit({ ...ejercicioEdit, [key]: value });
@@ -76,17 +79,17 @@ const EjercicioSelectModal: React.FC<EjercicioSelectModalProps> = ({ ejercicio, 
             <Spacer my={[1, 2]} />
             <Flex>
               <NumberInputLabeled
-                value={ejercicioEdit?.repeticiones}
-                onChangeNumber={(_s: string, v: number) => onChangeEjercicio("repeticiones", v)}
-                step={1}
-                label="Repeticiones"
-              />
-              <Spacer mx={[2, 3]} />
-              <NumberInputLabeled
                 value={ejercicioEdit?.carga}
                 onChangeNumber={(_s: string, v: number) => onChangeEjercicio("carga", v)}
                 step={0.5}
                 label="Carga (Kg.)"
+              />
+              <Spacer mx={[2, 3]} />
+              <NumberInputLabeled
+                value={ejercicioEdit?.repeticiones}
+                onChangeNumber={(_s: string, v: number) => onChangeEjercicio("repeticiones", v)}
+                step={1}
+                label="Repeticiones"
               />
             </Flex>
           </ModalBody>

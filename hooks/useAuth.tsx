@@ -1,4 +1,3 @@
-import Router from "next/router";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { createContext, useContext, useEffect, useReducer } from "react";
@@ -6,6 +5,8 @@ import { useError } from "./useError";
 import { api } from "../services/api";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
 import { User, UserFirebase } from "../types/Usuario.type";
+import { AxiosError } from "axios";
+import { useRouter } from "next/router";
 
 // Based on the example on https://usehooks.com/useAuth/
 
@@ -22,11 +23,12 @@ const config = {
 
 if (!firebase.apps.length) firebase.initializeApp(config);
 
-const AuthContext = createContext<{
-  user: User | UserFirebase;
-  loading: Boolean;
-  signout: () => Promise<void>;
-}>(null);
+const AuthContext =
+  createContext<{
+    user: User | UserFirebase;
+    loading: Boolean;
+    signout: () => Promise<void>;
+  }>(null);
 
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
@@ -67,13 +69,14 @@ interface UserAction {
 }
 
 export const useFirebaseUser = () => {
+  const router = useRouter();
   const error = useError();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const signout = async () => {
     await firebase.auth().signOut();
     dispatch({ type: "USER_LOGOUT" });
-    Router.push("/login");
+    router.push("/login");
   };
 
   // Listen to the Firebase Auth state and set the local state.
@@ -86,16 +89,33 @@ export const useFirebaseUser = () => {
         // I found that is the simplest way withouth having to do some convoluted async logic
         api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
 
+        api.interceptors.response.use(
+          (response) => {
+            return response;
+          },
+          async (err: AxiosError) => {
+            if (err?.response?.status === 401) {
+              // let userToken = await user.getIdToken();
+              // api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+              // return axios.request(err.config);
+              router.reload();
+              // await signout();
+            }
+            error.setError({ message: err.message, showContent: false, isError: true });
+            return Promise.reject(err);
+          }
+        );
+
         try {
-          let response = await usuariosApi.getUsuario(user.uid);
-          dispatch({ type: "USER_SUCCESS", payload: { ...user, idToken: userToken, ...response.data } });
+          let _usuario = await usuariosApi.getUsuario(user.uid);
+          dispatch({ type: "USER_SUCCESS", payload: { ...user, idToken: userToken, ..._usuario } });
         } catch (ex) {
           console.log(ex.message);
-          error.setError(ex.message);
+          error.setError({ message: ex.message, showContent: false, isError: true });
           dispatch({ type: "USER_NOT_REGISTERED", payload: { ...user, idToken: userToken } });
         }
       } else {
-        Router.push("/login");
+        router.push("/login");
       }
     });
     return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.

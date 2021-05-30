@@ -16,6 +16,15 @@ export const useMesociclos = (idUsuario: number) => {
     }
   );
 
+  const updateMesociclo = (mesociclo: Mesociclo) => {
+    queryClient.setQueryData<Mesociclo[]>(["mesociclos", idUsuario], (old) => {
+      return plainToClass(
+        Mesociclo,
+        old.map((m) => (m.idMesociclo === mesociclo.idMesociclo ? mesociclo : m))
+      );
+    });
+  };
+
   const updateSesion = (sesion: Sesion) => {
     queryClient.setQueryData<Mesociclo[]>(["mesociclos", idUsuario], (old) => {
       return plainToClass(
@@ -27,6 +36,17 @@ export const useMesociclos = (idUsuario: number) => {
       );
     });
   };
+  const deleteSesion = (idSesion: number) => {
+    queryClient.setQueryData<Mesociclo[]>(["mesociclos", idUsuario], (old) => {
+      return plainToClass(
+        Mesociclo,
+        old.map((m) => ({
+          ...m,
+          sesiones: m.sesiones.filter((s) => s.idSesion !== idSesion),
+        }))
+      );
+    });
+  };
 
-  return { ...query, updateSesion };
+  return { ...query, updateMesociclo, updateSesion, deleteSesion };
 };

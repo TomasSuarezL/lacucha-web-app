@@ -7,7 +7,9 @@ import NavBar from "./Navbar";
 import SideNav from "./SideNav";
 
 export default function Layout({ children }) {
-  const error = useError();
+  const {
+    error: { message, showContent, isError },
+  } = useError();
   const auth = useAuth();
 
   return (
@@ -18,19 +20,31 @@ export default function Layout({ children }) {
       </Head>
       <NavBar></NavBar>
       <Center w="full" bg="gray.50">
-        <Flex height={[null, "100vh"]} direction={["column", "row"]} w="full" pt={["24", "24"]}>
+        <Flex
+          height={[null, "100vh"]}
+          minHeight={"100vh"}
+          direction={["column", "row"]}
+          w="full"
+          pt={["24", "24"]}
+        >
           <SideNav />
-          {error?.error ? (
+          {isError && showContent === false ? (
             <Alert h={["12", "16"]} status="error">
               <AlertIcon />
-              <AlertTitle mr={2}>{error.error}</AlertTitle>
+              <AlertTitle mr={2}>{message}</AlertTitle>
             </Alert>
           ) : auth.loading ? (
             <Progress position="absolute" top="0" left="0" width="100vw" size="xs" isIndeterminate />
           ) : (
             auth.user && (
               <Box flex="1" overflow="auto">
-                <Flex flex="1" p={["3", "4"]} maxWidth="7xl">
+                <Flex flex="1" p={[1, 1, 3, 4]} direction="column" maxWidth="7xl">
+                  {isError && showContent && (
+                    <Alert h={["12", "16"]} status="error">
+                      <AlertIcon />
+                      <AlertTitle mr={2}>{message}</AlertTitle>
+                    </Alert>
+                  )}
                   {children}
                 </Flex>
               </Box>

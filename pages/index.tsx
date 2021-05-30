@@ -11,21 +11,30 @@ export default function Perfil() {
   const UserData = () => {
     const { email, uid, username, nombre, apellido, imgUrl, peso, altura, genero, nivel } = auth.user as User;
     return (
-      <Flex direction="column" align="center" w="full" boxShadow="xl" p={["4", "6"]} bg="white">
-        <Avatar size="2xl" name={nombre} src={imgUrl}></Avatar>
-        <Heading size="lg">{`${nombre} ${apellido}`}</Heading>
-        <Text as="em" fontSize="xl">{`${username}`}</Text>
-        <Box p={["2"]}></Box>
-        <Stack w="full" align="center" spacing="4">
-          <DataField value={email} label={"Email"} />
-          <Flex direction={["column", "column", "row"]} w="full">
-            <DataField value={altura.toString() + " m."} label={"Altura"} />
-            <Box m={["2", "2", "0"]} w="8"></Box>
-            <DataField value={peso.toString() + " Kg."} label={"Peso"} />
+      <Flex
+        direction={["column"]}
+        align="center"
+        m="auto"
+        boxShadow="xl"
+        p={["4", "6"]}
+        bg="white"
+        w={["full", "fit-content"]}
+      >
+        <Flex direction="column" w="full" align="center">
+          <Avatar size="2xl" name={nombre} src={imgUrl}></Avatar>
+          <Heading size="lg">{`${nombre} ${apellido}`}</Heading>
+          <Text as="em" fontSize="xl">{`${username}`}</Text>
+        </Flex>
+        <Spacer p={["2"]}></Spacer>
+        <Flex direction={["column", "row"]} wrap="wrap" justify="center" w="full">
+          <DataField m={[1]} value={email} label={"Email"} w="full" />
+          <Flex direcion={["column", "row"]} w="full">
+            <DataField m={[1]} value={altura.toString() + " m."} label={"Altura"} w="full" />
+            <DataField m={[1]} value={peso.toString() + " Kg."} label={"Peso"} w="full" />
           </Flex>
-          <DataField value={genero.descripcion} label={"Genero"} />
-          <DataField value={nivel.descripcion} label={"Nivel"} />
-        </Stack>
+          <DataField m={[1]} value={genero.descripcion} label={"Genero"} w="full" />
+          <DataField m={[1]} value={nivel.descripcion} label={"Nivel"} w="full" />
+        </Flex>
       </Flex>
     );
   };

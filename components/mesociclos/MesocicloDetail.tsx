@@ -1,60 +1,17 @@
-import {
-  Box,
-  Button,
-  CloseButton,
-  Divider,
-  Flex,
-  Spacer,
-  Stack,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Button, CloseButton, Divider, Flex, Spacer, Stack, Text } from "@chakra-ui/react";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import { useQueryClient } from "react-query";
+import { useMutation } from "react-query";
+import { useError } from "../../hooks/useError";
 import { useMesociclos } from "../../hooks/useMesociclos";
 import { Mesociclo, Sesion } from "../../models/Mesociclo";
+import { DeleteButton } from "../shared/Buttons";
 import DataField from "../shared/DataField";
+import { mesociclosApi } from "./Mesociclo.api";
+import { sesionesApi } from "./Sesion.api";
 import { SesionDetail } from "./SesionDetail";
-
-interface SesionTableProps {
-  sesiones: Sesion[];
-  setSesion: React.Dispatch<React.SetStateAction<Sesion>>;
-}
-
-const SesionesTable = ({ sesiones, setSesion }: SesionTableProps) => {
-  return (
-    <Box w="full">
-      <Table variant="simple" size="sm">
-        <Thead>
-          <Tr>
-            <Th>Fecha</Th>
-            <Th>Fecha Fin</Th>
-            <Th display={["none", "table-cell"]} isNumeric>
-              # Bloques
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sesiones.map((s) => (
-            <Tr key={s.idSesion} cursor="pointer" _hover={{ bg: "gray.100" }} onClick={() => setSesion(s)}>
-              <Td>{new Date(s.fechaEmpezado).toLocaleString()}</Td>
-              <Td>{s.fechaFinalizado ? new Date(s.fechaFinalizado).toLocaleString() : "-"}</Td>
-              <Td display={["none", "table-cell"]} isNumeric>
-                {s.bloques?.length}
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </Box>
-  );
-};
+import { SesionesTable } from "./SesionTable";
 
 interface MesocicloDetailProps {
   mesociclo: Mesociclo;
@@ -63,19 +20,80 @@ interface MesocicloDetailProps {
 
 export const MesocicloDetail: React.FC<MesocicloDetailProps> = ({ mesociclo, onClickCloseMesociclo }) => {
   const [sesion, setSesion] = useState<Sesion | null>(null);
-  const { updateSesion } = useMesociclos(mesociclo.usuario.idUsuario);
+  const { updateSesion, deleteSesion, updateMesociclo } = useMesociclos(mesociclo.usuario.idUsuario);
+  const { setError, clearError } = useError();
+  const updateSesionMutation = useMutation((sesion: Sesion) => sesionesApi.putSesion(sesion), {
+    onSuccess: (data) => {
+      clearError();
+      mesociclo.sesiones[mesociclo.sesiones.findIndex((s) => s.idSesion === sesion.idSesion)] = data;
+      updateSesion(data);
+    },
+    onError: (err: AxiosError) => {
+      console.error(err.response);
+      setError({
+        message: "No se pudo actualizar la sesión. Revisá los datos cargados, por favor.",
+        isError: true,
+        showContent: true,
+      });
+    },
+  });
+  const createSesionMutation = useMutation((sesion: Sesion) => sesionesApi.postSesion(sesion), {
+    onSuccess: (data) => {
+      clearError();
+      mesociclo.sesiones.push(data);
+      setSesion(null);
+    },
+    onError: (err: AxiosError) => {
+      console.error(err.response);
+      setError({
+        message: "No se pudo crear la sesión. Revisá los datos cargados, por favor.",
+        isError: true,
+        showContent: true,
+      });
+    },
+  });
+  const deleteSesionMutation = useMutation((sesion: Sesion) => sesionesApi.deleteSesion(sesion.idSesion), {
+    onSuccess: () => {
+      clearError();
+      mesociclo.sesiones = mesociclo.sesiones.filter((s) => s.idSesion !== sesion.idSesion);
+      deleteSesion(sesion.idSesion);
+      setSesion(null);
+    },
+    onError: (err: AxiosError) => {
+      console.error(err.response);
+      setError({
+        message: "Ocurrió un error al eliminar la sesión.",
+        isError: true,
+        showContent: true,
+      });
+    },
+  });
+
+  const updateMesociclcoMutation = useMutation(
+    (mesociclo: Mesociclo) => mesociclosApi.putMesociclo(mesociclo.cancelar()),
+    {
+      onSuccess: (data) => {
+        clearError();
+        updateMesociclo(data);
+        onClickCloseMesociclo();
+      },
+      onError: (err: AxiosError) => {
+        console.error(err.response);
+        setError({
+          message: "Ocurrió un error al cancelar el mesociclo.",
+          isError: true,
+          showContent: true,
+        });
+      },
+    }
+  );
 
   const onClickCloseSesion = () => {
     setSesion(null);
   };
 
-  const onUpdateMesocicloSesion = (sesion: Sesion) => {
-    mesociclo.sesiones[mesociclo.sesiones.findIndex((s) => s.idSesion === sesion.idSesion)] = sesion;
-    updateSesion(sesion);
-  };
-
   const onSesionAdd = () => {
-    let _sesion = new Sesion();
+    let _sesion = new Sesion(mesociclo.sesiones.length + 1, mesociclo.idMesociclo);
     setSesion(_sesion);
   };
 
@@ -113,27 +131,43 @@ export const MesocicloDetail: React.FC<MesocicloDetailProps> = ({ mesociclo, onC
       <Spacer m={[1, 2]} />
       {!sesion ? (
         <>
-          <Stack direction={["column", "column", "row"]} m={[1, 2, 3]} spacing={["2", "3"]}>
-            <DataField value={mesociclo.objetivo?.descripcion} label="Objetivo" />
-            <DataField value={mesociclo.organizacion?.descripcion} label="Organización" />
-            <DataField value={mesociclo.nivel?.descripcion} label="Nivel" />
+          <Stack direction={["column", "column", "column", "row"]} m={[1, 2, 3]} spacing={["2", "3"]}>
+            <DataField value={mesociclo.objetivo?.descripcion} label="Objetivo" w="full" />
+            <DataField value={mesociclo.organizacion?.descripcion} label="Organización" w="full" />
+            <DataField value={mesociclo.nivel?.descripcion} label="Nivel" w="full" />
           </Stack>
-          <Stack direction={["column", "column", "row"]} m={[1, 2, 3]} spacing={["2", "3"]}>
-            <DataField value={mesociclo.semanasPorMesociclo?.toString()} label="Semanas por Mesociclo" />
-            <DataField value={mesociclo.sesionesPorSemana?.toString()} label="Sesiones por Semana" />
+          <Stack
+            direction={["column", "column", "column", "column", "row"]}
+            m={[1, 2, 3]}
+            spacing={["2", "3"]}
+          >
+            <Stack direction={["column", "row"]}>
+              <DataField
+                value={mesociclo.semanasPorMesociclo?.toString()}
+                label="Semanas por Mesociclo"
+                w="full"
+              />
+              <DataField
+                value={mesociclo.sesionesPorSemana?.toString()}
+                label="Sesiones por Semana"
+                w="full"
+              />
+            </Stack>
             <DataField
               value={mesociclo.principalTrenSuperior?.nombre}
               label="Ejercicio Principal Tren Superior"
+              w="full"
             />
             <DataField
               value={mesociclo.principalTrenInferior?.nombre}
               label="Ejercicio Principal Tren Inferior"
+              w="full"
             />
           </Stack>
           {mesociclo.estaFinalizado() && (
             <>
               <Divider my={[1, 2, 4]} />
-              <Stack direction={["column", "column", "row"]} m={[1, 2, 3]} spacing={["2", "3"]}>
+              <Stack direction={["column", "column", "column", "row"]} m={[1, 2, 3]} spacing={["2", "3"]}>
                 <DataField value={mesociclo.aumentoMotivacion ? "Si" : "No"} label="Aumento Motivación?" />
                 <DataField
                   value={mesociclo.masCercaObjetivos ? "Si" : "No"}
@@ -146,20 +180,53 @@ export const MesocicloDetail: React.FC<MesocicloDetailProps> = ({ mesociclo, onC
             </>
           )}
           <Divider my={[1, 2, 4]} />
-          <Flex>
+          <Flex align="center">
             <Text fontSize={["lg", "xl"]} mx={[2, 2, 4]} alignSelf="flex-start">
               Sesiones
             </Text>
             <Spacer />
-            <Button size="sm" mx={[1, 2]} onClick={() => onSesionAdd()}>
-              <AiOutlinePlus /> Agregar Sesión
-            </Button>
+            {mesociclo.semanasPorMesociclo * mesociclo.sesionesPorSemana != mesociclo.sesiones.length && (
+              <Text color="red.300">{`Hay ${mesociclo.sesiones.length} sesiones activas y deberían ser ${
+                mesociclo.semanasPorMesociclo * mesociclo.sesionesPorSemana
+              }.`}</Text>
+            )}
+            {mesociclo.estaActivo() && (
+              <Button size="sm" mx={[1, 2]} onClick={() => onSesionAdd()}>
+                <AiOutlinePlus /> Agregar Sesión
+              </Button>
+            )}
           </Flex>
           <Spacer m={[1, 2]} />
           <SesionesTable sesiones={mesociclo.sesiones} setSesion={setSesion} />
+          <Spacer m={[1, 2]} />
+          {mesociclo.estaActivo() && (
+            <Flex>
+              <Spacer />
+              <DeleteButton
+                onClick={() => updateMesociclcoMutation.mutate(mesociclo)}
+                isLoading={updateMesociclcoMutation.isLoading}
+                loadingText="Cancelando..."
+              >
+                Cancelar Mesociclo
+              </DeleteButton>
+            </Flex>
+          )}
         </>
       ) : (
-        <SesionDetail sesion={sesion} updateSesion={onUpdateMesocicloSesion} />
+        <SesionDetail
+          sesion={sesion}
+          onSave={
+            sesion.idSesion
+              ? (sesion: Sesion) => updateSesionMutation.mutate(sesion)
+              : (sesion: Sesion) => createSesionMutation.mutate(sesion)
+          }
+          onDelete={(sesion: Sesion) => deleteSesionMutation.mutate(sesion)}
+          isLoading={
+            updateSesionMutation.isLoading || createSesionMutation.isLoading || deleteSesionMutation.isLoading
+          }
+          isNew={!sesion.idSesion}
+          isReadOnly={!mesociclo.estaActivo()}
+        />
       )}
     </Flex>
   );

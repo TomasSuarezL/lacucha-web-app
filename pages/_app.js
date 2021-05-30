@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { QueryClientProvider, QueryClient } from "react-query";
+import { Hydrate } from "react-query/hydration";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ProvideAuth } from "../hooks/useAuth";
@@ -18,8 +19,10 @@ function MyApp({ Component, pageProps }) {
       <ProvideError>
         <ProvideAuth>
           <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <Hydrate state={pageProps.dehydratedState}>
+              <Component {...pageProps} />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </Hydrate>
           </QueryClientProvider>
         </ProvideAuth>
       </ProvideError>

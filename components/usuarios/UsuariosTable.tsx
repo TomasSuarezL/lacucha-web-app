@@ -1,13 +1,13 @@
 import { Box, Table, Thead, Tr, Th, Tbody, Td } from "@chakra-ui/react";
+import Link from "next/link";
 import React from "react";
 import { Usuario } from "../../types/Usuario.type";
 
 interface UsuariosTableProps {
   usuarios: Usuario[];
-  setUsuario: React.Dispatch<React.SetStateAction<Usuario>>;
 }
 
-export const UsuariosTable: React.FC<UsuariosTableProps> = ({ usuarios, setUsuario }) => {
+export const UsuariosTable: React.FC<UsuariosTableProps> = ({ usuarios }) => {
   return (
     <Box boxShadow="xl" bg="white" w="full">
       <Table variant="simple" size="md">
@@ -26,17 +26,19 @@ export const UsuariosTable: React.FC<UsuariosTableProps> = ({ usuarios, setUsuar
         </Thead>
         <Tbody>
           {usuarios.map((u) => (
-            <Tr key={u.uuid} cursor="pointer" _hover={{ bg: "gray.100" }} onClick={() => setUsuario(u)}>
-              <Td>{`${u.nombre} ${u.apellido}`}</Td>
-              <Td display={["none", "none", "none", "table-cell"]}>{u.email}</Td>
-              <Td display={["none", "none", "none", "table-cell"]} isNumeric>
-                {u.peso}
-              </Td>
-              <Td display={["none", "none", "none", "table-cell"]} isNumeric>
-                {u.altura}
-              </Td>
-              <Td>{u.nivel.descripcion}</Td>
-            </Tr>
+            <Link key={u.uuid} href={`/usuarios/${u.uuid}`}>
+              <Tr cursor="pointer" _hover={{ bg: "gray.100" }}>
+                <Td>{`${u.nombre} ${u.apellido}`}</Td>
+                <Td display={["none", "none", "none", "table-cell"]}>{u.email}</Td>
+                <Td display={["none", "none", "none", "table-cell"]} isNumeric>
+                  {u.peso}
+                </Td>
+                <Td display={["none", "none", "none", "table-cell"]} isNumeric>
+                  {u.altura}
+                </Td>
+                <Td>{u.nivel.descripcion}</Td>
+              </Tr>
+            </Link>
           ))}
         </Tbody>
       </Table>
