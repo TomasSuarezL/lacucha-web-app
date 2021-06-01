@@ -19,7 +19,7 @@ export default function Login() {
         <title>La Cucha</title>
         <link rel="icon" href="/logo_simple_negro_sin_padding.png" />
       </Head>
-      {auth.loading || auth.user ? (
+      {auth.loading || !auth.user ? (
         <Progress position="absolute" top="0" width="full" size="xs" isIndeterminate />
       ) : (
         <Box
