@@ -48,7 +48,7 @@ interface UserState {
   loading: Boolean;
 }
 
-const initialState = { user: null, loading: true };
+const initialState = { user: null, loading: false };
 
 function reducer(state: UserState, action: UserAction) {
   switch (action.type) {
