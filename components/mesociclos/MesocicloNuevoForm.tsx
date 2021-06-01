@@ -76,7 +76,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
         <RadioCardsLabeled
           label={"Objetivo"}
           options={Objetivos.map((o) => o.descripcion)}
-          onChange={(v: string) =>
+          onChangeHandler={(v: string) =>
             onMesocicloChange("objetivo", Objetivos.filter((o) => o.descripcion === v)[0])
           }
           isInvalid={!mesociclo.objetivo}
@@ -84,7 +84,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
         <RadioCardsLabeled
           label={"Organización"}
           options={Organizaciones.map((o) => o.descripcion)}
-          onChange={(v: string) =>
+          onChangeHandler={(v: string) =>
             onMesocicloChange("organizacion", Organizaciones.filter((o) => o.descripcion === v)[0])
           }
           isInvalid={!mesociclo.organizacion}
@@ -112,7 +112,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
           <EjercicioSelectLabeled
             label="Ejercicio Tren Superior Principal"
             ejercicio={mesociclo.principalTrenSuperior}
-            onChange={(ejercicio) => onMesocicloChange("principalTrenSuperior", ejercicio)}
+            onChangeHandler={(ejercicio) => onMesocicloChange("principalTrenSuperior", ejercicio)}
             patrones={["Empuje", "Tracción"]}
             w="full"
           />
@@ -120,7 +120,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
           <EjercicioSelectLabeled
             label="Ejercicio Tren Inferior Principal"
             ejercicio={mesociclo.principalTrenInferior}
-            onChange={(ejercicio) => onMesocicloChange("principalTrenInferior", ejercicio)}
+            onChangeHandler={(ejercicio) => onMesocicloChange("principalTrenInferior", ejercicio)}
             patrones={["Rodilla", "Cadera"]}
             w="full"
           />

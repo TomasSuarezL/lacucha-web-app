@@ -181,14 +181,14 @@ export const DatePickerLabeled: React.FC<DatePickerLabeledProps> = ({
 interface RadioCardsLabeledProps extends FlexProps {
   label: string;
   options: string[];
-  onChange: (v: string) => void;
+  onChangeHandler: (v: string) => void;
   direction?: "row" | "column";
   isInvalid?: boolean;
 }
 
 export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
   options,
-  onChange,
+  onChangeHandler: _onChange,
   label,
   direction = "column",
   isInvalid = false,
@@ -197,7 +197,7 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "framework",
     defaultValue: "react",
-    onChange: onChange,
+    onChange: _onChange,
   });
 
   const group = getRootProps();
@@ -264,21 +264,21 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
 export interface EjercicioSelectLabeledProps extends FlexProps {
   label: string;
   ejercicio: Ejercicio;
-  onChange: (ejercicio: Ejercicio) => void;
+  onChangeHandler: (ejercicio: Ejercicio) => void;
   patrones?: string[];
 }
 
 export const EjercicioSelectLabeled: React.FC<EjercicioSelectLabeledProps> = ({
   label,
   ejercicio,
-  onChange,
+  onChangeHandler: _onChange,
   patrones,
   ...props
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const onSave = (ejercicio: Ejercicio) => {
-    onChange(ejercicio);
+    _onChange(ejercicio);
     setIsOpen(false);
   };
 
