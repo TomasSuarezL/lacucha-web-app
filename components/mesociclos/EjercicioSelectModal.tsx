@@ -23,12 +23,16 @@ interface EjercicioSelectModalProps {
   onSave: (ejercicio: EjerciciosXBloque) => void;
 }
 
-const EjercicioSelectModal: React.FC<EjercicioSelectModalProps> = ({ ejercicio, onClose, onSave }) => {
+const EjercicioSelectModal: React.FC<EjercicioSelectModalProps> = ({
+  ejercicio,
+  onClose,
+  onSave,
+}) => {
   const [ejercicioEdit, setEjercicioEdit] = useState(ejercicio);
   const [patron, setPatron] = useState(ejercicio.ejercicio?.patron || "Empuje");
   const { data, isLoading, isError, error, isSuccess } = useQueryCache<Ejercicio[]>(
-    ["ejercicios", patron],
-    () => ejerciciosApi.getEjercicios(patron)
+    ["ejercicios", patron as string],
+    () => ejerciciosApi.getEjercicios(patron as string)
   );
 
   useEffect(() => {
@@ -73,7 +77,11 @@ const EjercicioSelectModal: React.FC<EjercicioSelectModalProps> = ({ ejercicio, 
                     data.filter((e) => e.idEjercicio.toString() === ev.target.value)[0]
                   )
                 }
-                options={data.map((e) => ({ key: e.nombre, value: e.idEjercicio, description: e.nombre }))}
+                options={data.map((e) => ({
+                  key: e.nombre,
+                  value: e.idEjercicio,
+                  description: e.nombre,
+                }))}
               />
             )}
             <Spacer my={[1, 2]} />
