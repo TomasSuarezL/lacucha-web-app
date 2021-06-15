@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ProvideAuth } from "../hooks/useAuth";
 import { ProvideError } from "../hooks/useError";
+import Layout from "../components/shared/Layout";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,9 @@ function MyApp({ Component, pageProps }) {
         <ProvideAuth>
           <QueryClientProvider client={queryClient}>
             <Hydrate state={pageProps.dehydratedState}>
-              <Component {...pageProps} />
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
               <ReactQueryDevtools initialIsOpen={false} />
             </Hydrate>
           </QueryClientProvider>

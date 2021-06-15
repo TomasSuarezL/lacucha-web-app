@@ -34,9 +34,10 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
   const [formValido, setFormValido] = useState<Boolean>(true);
   const [loadingSesiones, setLoadingSesiones] = useState<Boolean>(false);
 
-  console.log(mesociclo);
-
-  const onMesocicloChange = (key: string, value: string | number | Objetivo | Organizacion | Ejercicio) => {
+  const onMesocicloChange = (
+    key: string,
+    value: string | number | Objetivo | Organizacion | Ejercicio
+  ) => {
     setMesociclo(plainToClass(Mesociclo, { ...mesociclo, [key]: value }));
   };
 
@@ -80,6 +81,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
             onMesocicloChange("objetivo", Objetivos.filter((o) => o.descripcion === v)[0])
           }
           isInvalid={!mesociclo.objetivo}
+          selectedValue={mesociclo.objetivo?.descripcion}
         />
         <RadioCardsLabeled
           label={"Organización"}
@@ -88,6 +90,7 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
             onMesocicloChange("organizacion", Organizaciones.filter((o) => o.descripcion === v)[0])
           }
           isInvalid={!mesociclo.organizacion}
+          selectedValue={mesociclo.organizacion?.descripcion}
         />
         <Flex direction={["column", "row"]}>
           <NumberInputLabeled
@@ -156,7 +159,10 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
                   Sesiones
                 </Text>
                 <Spacer p={[1, 2]} />
-                <SesionesTable sesiones={semana} setSesion={(sesion: Sesion) => onClickSesion(sesion)} />
+                <SesionesTable
+                  sesiones={semana}
+                  setSesion={(sesion: Sesion) => onClickSesion(sesion)}
+                />
                 <Spacer p={[2]} />
                 <SaveButton onClick={() => onMesocicloSesionesGenerar()}>Crear Sesiones</SaveButton>
               </Flex>

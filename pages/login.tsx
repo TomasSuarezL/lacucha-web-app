@@ -1,15 +1,12 @@
 import Head from "next/head";
 import Router from "next/router";
-import Image from "next/image";
-import { Box, Text, Spacer, Button, Progress, Flex, Center } from "@chakra-ui/react";
+import { Box, Progress, Flex, Center } from "@chakra-ui/react";
 import React from "react";
 import SignInScreen from "../services/firebase";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const auth = useAuth();
-
-  console.log(auth);
 
   if (auth.user) Router.push("/");
 

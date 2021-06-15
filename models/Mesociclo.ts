@@ -1,8 +1,9 @@
 import "reflect-metadata";
-import { Type } from "class-transformer";
+import { plainToClass, Type } from "class-transformer";
 import { Nivel, Usuario } from "../types/Usuario.type";
 import { immerable } from "immer";
 import { ejerciciosApi } from "../components/mesociclos/Ejercicios.api";
+import { addWeeks, differenceInWeeks, parseISO } from "date-fns";
 
 export class Mesociclo {
   idMesociclo: number;
@@ -72,9 +73,13 @@ export class Mesociclo {
     // loop over number of sesiones por semana
     // for each sesion, create 3 bloques with random ejercicios
     let _ejercicios = await ejerciciosApi.getEjercicios(PatronesMovimiento.join(","));
-    let _trenSuperior = _ejercicios.filter((e) => ["Empuje", "Tracción"].includes(e.patron));
-    let _trenInferior = _ejercicios.filter((e) => ["Rodilla", "Cadera"].includes(e.patron));
-    let _core = _ejercicios.filter((e) => ["Core"].includes(e.patron));
+    let _trenSuperior = _ejercicios.filter((e) =>
+      ["Empuje", "Tracción"].includes(e.patron as string)
+    );
+    let _trenInferior = _ejercicios.filter((e) =>
+      ["Rodilla", "Cadera"].includes(e.patron as string)
+    );
+    let _core = _ejercicios.filter((e) => ["Core"].includes(e.patron as string));
 
     this.sesiones = [];
 
@@ -133,6 +138,19 @@ export class Mesociclo {
     });
 
     return _sesiones.flat();
+  }
+
+  static copiarDe(mesociclo: Mesociclo) {
+    let diffWeeks = differenceInWeeks(new Date(), mesociclo.getFechaInicio());
+    let _mesociclo = { ...mesociclo };
+    _mesociclo.sesiones = mesociclo.sesiones.map((s) => {
+      return plainToClass(Sesion, {
+        ...s,
+        fechaFinalizado: null,
+        fechaEmpezado: addWeeks(parseISO(s.fechaEmpezado.toString()), diffWeeks),
+      });
+    });
+    return plainToClass(Mesociclo, _mesociclo);
   }
 }
 
@@ -216,8 +234,23 @@ export interface EjerciciosXBloque {
 export interface Ejercicio {
   idEjercicio: number;
   nombre: string;
-  patron: string;
+  patron: string | PatronMovimiento;
   urlVideo: string;
+  pesoInicial: number;
+  esTemporal: boolean;
 }
 
-export const PatronesMovimiento = ["Empuje", "Tracción", "Rodilla", "Cadera", "Core"];
+export interface PatronMovimiento {
+  idPatron: number;
+  descripcion: string;
+}
+
+export const PatronesMovimiento = <const>["Empuje", "Tracción", "Rodilla", "Cadera", "Core"];
+
+export const PatronesMovimientoMap = {
+  Empuje: { idPatron: 1, descripcion: "Empuje" },
+  Tracción: { idPatron: 5, descripcion: "Tracción" },
+  Rodilla: { idPatron: 2, descripcion: "Rodilla" },
+  Cadera: { idPatron: 4, descripcion: "Cadera" },
+  Core: { idPatron: 3, descripcion: "Core" },
+};

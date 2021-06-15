@@ -6,7 +6,7 @@ import { usuariosApi } from "../components/usuarios/Usuarios.api";
 import { Usuario } from "../types/Usuario.type";
 import { useError } from "./useError";
 
-export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: Usuario) => void] = () => {
+export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: Usuario) => void, boolean] = () => {
   const router = useRouter();
   const { idUsuario } = router.query;
   const queryClient = useQueryClient();
@@ -51,5 +51,5 @@ export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: U
     },
   });
 
-  return [usuario, setUsuario, (usuario: Usuario) => updateUsuarioMutation.mutate(usuario)];
+  return [usuario, setUsuario, (usuario: Usuario) => updateUsuarioMutation.mutate(usuario), updateUsuarioMutation.isLoading];
 };

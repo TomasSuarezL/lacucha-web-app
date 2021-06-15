@@ -1,8 +1,21 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { plainToClass } from "class-transformer";
-import { CloseButton, Flex, Spacer, Spinner, Text } from "@chakra-ui/react";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+  CloseButton,
+  Flex,
+  Spacer,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import Layout from "../../../components/shared/Layout";
 import { Mesociclo, Sesion } from "../../../models/Mesociclo";
 import Link from "next/link";
@@ -12,41 +25,53 @@ import { mesociclosApi } from "../../../components/mesociclos/Mesociclo.api";
 import { useError } from "../../../hooks/useError";
 import { AxiosError } from "axios";
 import { useUsuario } from "../../../hooks/useUsuario";
+import { AiOutlinePlus } from "react-icons/ai";
+import { useMesociclos } from "../../../hooks/useMesociclos";
+import { SaveButton } from "../../../components/shared/Buttons";
 
-const NuevoMesociclo = () => {
+const NuevoMesociclo = ({ usuario }) => {
   const router = useRouter();
   const [mesociclo, setMesociclo] = useState<Mesociclo>(new Mesociclo());
   const [sesionEdit, setSesionEdit] = useState<Sesion | null>(null);
   const [semana, setSemana] = useState<Sesion[] | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const { setError, clearError } = useError();
-  const [usuario, _] = useUsuario();
   const queryClient = useQueryClient();
+  const { data: mesociclos } = useMesociclos(usuario.idUsuario);
+  const cancelRef = React.useRef();
 
-  const createMutation = useMutation((mesociclo: Mesociclo) => mesociclosApi.postMesociclo(mesociclo), {
-    onSuccess: (data) => {
-      clearError();
-      let _old = queryClient.getQueryData(["mesociclos", usuario.idUsuario]);
-      if (_old) {
-        queryClient.setQueryData<Mesociclo[]>(["mesociclos", usuario.idUsuario], (old) => {
-          return plainToClass(Mesociclo, [...(old ? old : []), data]);
+  const createMutation = useMutation(
+    (mesociclo: Mesociclo) => mesociclosApi.postMesociclo(mesociclo),
+    {
+      onSuccess: (data) => {
+        clearError();
+        let _old = queryClient.getQueryData(["mesociclos", usuario.idUsuario]);
+        if (_old) {
+          queryClient.setQueryData<Mesociclo[]>(["mesociclos", usuario.idUsuario], (old) => {
+            return plainToClass(Mesociclo, [data, ...(old ? old : [])]);
+          });
+        }
+        router.push(`/usuarios/${usuario.uuid}`);
+      },
+      onError: (err: AxiosError) => {
+        console.error(err.response);
+        setError({
+          message: "No se pudo crear la sesión. Revisá los datos cargados, por favor.",
+          isError: true,
+          showContent: true,
         });
-      }
-      router.push(`/usuarios/${usuario.uuid}`);
-    },
-    onError: (err: AxiosError) => {
-      console.error(err.response);
-      setError({
-        message: "No se pudo crear la sesión. Revisá los datos cargados, por favor.",
-        isError: true,
-        showContent: true,
-      });
-    },
-  });
+      },
+    }
+  );
 
   const onSaveMesociclo = () => {
     mesociclo.usuario = usuario;
     mesociclo.nivel = usuario.nivel;
-    createMutation.mutate(mesociclo);
+    if (mesociclos.filter((m) => m.estaActivo()).length > 0) {
+      setIsAlertOpen(true);
+    } else {
+      createMutation.mutate(mesociclo);
+    }
   };
 
   const onSaveSesionEdit = (sesion: Sesion) => {
@@ -55,7 +80,25 @@ const NuevoMesociclo = () => {
     setSesionEdit(null);
   };
 
-  return usuario ? (
+  const onCopyMesociclo = () => {
+    const ultimoMesociclo = mesociclos.reduce((prev, curr) =>
+      prev.idMesociclo > curr.idMesociclo ? prev : curr
+    );
+
+    ultimoMesociclo
+      ? setMesociclo(Mesociclo.copiarDe(ultimoMesociclo))
+      : setError({
+          message: "No se encontró un mesociclo anterior.",
+          isError: true,
+          showContent: true,
+        });
+  };
+
+  if (createMutation.isLoading) {
+    return <Spinner m={[2, 3, 4]} alignSelf="center" />;
+  }
+
+  return (
     <Flex direction="column" m={[1, 6]} p={[3, 4, 6]} bg="white" boxShadow="lg">
       <Flex direction="row" justify="flex-end" m={[2, 3]}>
         <Text
@@ -68,6 +111,9 @@ const NuevoMesociclo = () => {
           {usuario?.nombre} {usuario?.apellido}
         </Text>
         <Spacer />
+        <Button size="sm" mx={[1, 2]} onClick={onCopyMesociclo} isDisabled={!mesociclos}>
+          <AiOutlinePlus /> <Text ml={[1]}>Copiar Mesociclo Anterior</Text>
+        </Button>
         {sesionEdit ? (
           <CloseButton
             colorScheme="gray"
@@ -76,7 +122,7 @@ const NuevoMesociclo = () => {
             onClick={() => setSesionEdit(null)}
           ></CloseButton>
         ) : (
-          <Link href="/usuarios">
+          <Link href={`/usuarios/${usuario.uuid}`}>
             <CloseButton colorScheme="gray" size="md" variant="ghost"></CloseButton>
           </Link>
         )}
@@ -98,16 +144,48 @@ const NuevoMesociclo = () => {
           onClickSesion={(sesion: Sesion) => setSesionEdit(sesion)}
         />
       )}
+      <AlertDialog
+        isOpen={isAlertOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsAlertOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Crear Mesociclo
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              El usuario ya tiene un mesociclo activo. Vas a crearlo igualmente?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button
+                size="sm"
+                variant="ghost"
+                ref={cancelRef}
+                onClick={() => setIsAlertOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <SaveButton
+                onClick={() => {
+                  setIsAlertOpen(false);
+                  createMutation.mutate(mesociclo);
+                }}
+                ml={3}
+              >
+                Crear
+              </SaveButton>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Flex>
-  ) : (
-    <Spinner />
   );
 };
 
 export default function NuevoMesocicloPage() {
-  return (
-    <Layout>
-      <NuevoMesociclo />
-    </Layout>
-  );
+  const [usuario, _] = useUsuario();
+  return usuario ? <NuevoMesociclo usuario={usuario} /> : <Spinner />;
 }

@@ -1,4 +1,17 @@
-import { Box, Button, Flex, Spacer, Spinner, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Spacer,
+  Spinner,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -45,10 +58,16 @@ const MesociclosTable: React.FC<MesocicloTableProps> = ({ mesociclos, setMesocic
               </Td>
               <Td>{m.estado.descripcion}</Td>
               <Td display={["none", "none", "none", "table-cell"]}>{m.nivel.descripcion}</Td>
-              <Td whiteSpace="nowrap" display={["none", "none", "none", "none", "none", "table-cell"]}>
+              <Td
+                whiteSpace="nowrap"
+                display={["none", "none", "none", "none", "none", "table-cell"]}
+              >
                 {m.objetivo.descripcion}
               </Td>
-              <Td whiteSpace="nowrap" display={["none", "none", "none", "none", "none", "table-cell"]}>
+              <Td
+                whiteSpace="nowrap"
+                display={["none", "none", "none", "none", "none", "table-cell"]}
+              >
                 {m.organizacion.descripcion}
               </Td>
               <Td display={["none", "none", "none", "table-cell"]} isNumeric>
@@ -71,7 +90,9 @@ interface UsuarioMesociclosProps {
 }
 
 export const UsuarioMesociclos: React.FC<UsuarioMesociclosProps> = ({ usuario, setMesociclo }) => {
-  const { isLoading, isFetching, isSuccess, data, isError, error } = useMesociclos(usuario.idUsuario);
+  const { isLoading, isFetching, isSuccess, data, isError, error } = useMesociclos(
+    usuario.idUsuario
+  );
 
   return (
     <Flex direction="column" p={[1, 2]} align="center">
@@ -86,7 +107,7 @@ export const UsuarioMesociclos: React.FC<UsuarioMesociclosProps> = ({ usuario, s
         </Text>
         <Spacer />
         <Link href={`/usuarios/${usuario.uuid}/nuevoMesociclo`}>
-          <Button size="sm" mx={[1, 2]} onClick={() => {}}>
+          <Button size="sm" mx={[1, 2]}>
             <AiOutlinePlus /> <Text ml={[1]}>Crear Mesociclo</Text>
           </Button>
         </Link>

@@ -1,4 +1,14 @@
-import { Box, Text, Spacer, Heading, Progress, Flex, Avatar, Container, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  Text,
+  Spacer,
+  Heading,
+  Progress,
+  Flex,
+  Avatar,
+  Container,
+  Stack,
+} from "@chakra-ui/react";
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import Layout from "../components/shared/Layout";
@@ -8,8 +18,11 @@ import { User } from "../types/Usuario.type";
 export default function Perfil() {
   const auth = useAuth();
 
+  console.log(auth);
+
   const UserData = () => {
-    const { email, uid, username, nombre, apellido, imgUrl, peso, altura, genero, nivel } = auth.user as User;
+    const { email, uid, username, nombre, apellido, imgUrl, peso, altura, genero, nivel } =
+      auth.user as User;
     return (
       <Flex
         direction={["column"]}
@@ -40,13 +53,10 @@ export default function Perfil() {
   };
 
   return (
-    <Layout>
-      {auth.user && (
-        <Box as="main" w="full">
-          <UserData />
-        </Box>
-      )}
-    </Layout>
+    auth.user && (
+      <Box as="main" w="full">
+        <UserData />
+      </Box>
+    )
   );
 }
-6;

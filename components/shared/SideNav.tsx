@@ -18,7 +18,7 @@ const NavBarLink = ({ url, name, icon }) => {
         _hover={{ bg: "gray.200" }}
         p={[0, 4]}
         w="full"
-        bg={router.asPath === url && "gray.100"}
+        bg={"/" + router.asPath.split("/")[1] === url && "gray.100"}
       >
         <Icon as={icon} w={["4", "6"]} h={["4", "6"]} mr={["2", "5"]}></Icon>
         {name}
@@ -34,7 +34,7 @@ export default function NavBar() {
       display="flex"
       alignItems={["center", "flex-start"]}
       justifyContent={["center", "flex-start"]}
-      px={[2, 2, 6, 6, 16]}
+      px={[2, 2, 6, 6, 8]}
       py={[4, 16]}
       minWidth={[null, null, "2xs", "2xs"]}
       spacing={["8px", "24px"]}

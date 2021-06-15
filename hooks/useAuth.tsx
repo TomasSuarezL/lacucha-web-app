@@ -1,12 +1,13 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import { createContext, useContext, useEffect, useReducer } from "react";
+import { AxiosError } from "axios";
+import { useRouter } from "next/router";
+import nookies from "nookies";
 import { useError } from "./useError";
 import { api } from "../services/api";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
 import { User, UserFirebase } from "../types/Usuario.type";
-import { AxiosError } from "axios";
-import { useRouter } from "next/router";
 
 // Based on the example on https://usehooks.com/useAuth/
 
@@ -21,7 +22,10 @@ const config = {
   measurementId: "G-QKB7JT11D3",
 };
 
-if (!firebase.apps.length) firebase.initializeApp(config);
+if (typeof window !== "undefined" && !firebase.apps.length) {
+  firebase.initializeApp(config);
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+}
 
 const AuthContext =
   createContext<{
@@ -79,8 +83,33 @@ export const useFirebaseUser = () => {
     router.push("/login");
   };
 
+  // force refresh the token every 10 minutes
+  useEffect(() => {
+    const handle = setInterval(async () => {
+      const user = firebase.auth().currentUser;
+      if (user) await user.getIdToken(true);
+    }, 10 * 60 * 1000);
+
+    // clean up setInterval
+    return () => clearInterval(handle);
+  }, []);
+
   // Listen to the Firebase Auth state and set the local state.
   useEffect(() => {
+    // listen for changes in IdToken and save it to cookies and set in axios defaults
+    firebase.auth().onIdTokenChanged(async (user) => {
+      if (!user) {
+        dispatch({ type: "USER_LOGOUT" });
+        nookies.set(undefined, "token", "", { path: "/" });
+      } else {
+        console.log("Id Token Changed");
+        const userToken = await user.getIdToken();
+        state.user && dispatch({ type: "USER_SUCCESS", payload: { ...state.user, idToken: userToken } });
+        api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+        nookies.set(undefined, "token", userToken, { path: "/" });
+      }
+    });
+
     const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         let userToken = await user.getIdToken();
@@ -88,23 +117,6 @@ export const useFirebaseUser = () => {
         // Configure the token on the API wrapper: Because we need the token obtained in this call to the auth server
         // I found that is the simplest way withouth having to do some convoluted async logic
         api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-
-        api.interceptors.response.use(
-          (response) => {
-            return response;
-          },
-          async (err: AxiosError) => {
-            if (err?.response?.status === 401) {
-              // let userToken = await user.getIdToken();
-              // api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-              // return axios.request(err.config);
-              router.reload();
-              // await signout();
-            }
-            error.setError({ message: err.message, showContent: false, isError: true });
-            return Promise.reject(err);
-          }
-        );
 
         try {
           let _usuario = await usuariosApi.getUsuario(user.uid);

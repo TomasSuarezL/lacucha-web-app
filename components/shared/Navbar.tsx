@@ -17,13 +17,13 @@ const NavBar = () => {
       display="flex"
       flexDirection="row"
       alignItems="center"
-      p={2}
+      p={1}
       bg="gray.800"
     >
       <Link href="/">
-        <a>
-          <Image src="/logo_simple_blanco.png" width="64" height="64"></Image>
-        </a>
+        <Flex ml={[1, 2, 4]} cursor="pointer">
+          <Image src="/logo_simple_blanco.png" width="72" height="72"></Image>
+        </Flex>
       </Link>
       <Spacer />
       {auth.user && (

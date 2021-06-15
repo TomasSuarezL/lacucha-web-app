@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { Avatar, CloseButton, Divider, Flex, Spacer, Progress, Stack, Text, Box } from "@chakra-ui/react";
+import {
+  Avatar,
+  CloseButton,
+  Divider,
+  Flex,
+  Spacer,
+  Progress,
+  Stack,
+  Text,
+  Box,
+} from "@chakra-ui/react";
 import { MesocicloDetail } from "../../../components/mesociclos/MesocicloDetail";
 import { SaveButton } from "../../../components/shared/Buttons";
 import { InputLabeled, NumberInputLabeled, SelectLabeled } from "../../../components/shared/Inputs";
@@ -16,17 +26,25 @@ interface UsuarioDatosProps {
 }
 
 const UsuarioDatos = ({ onClickCloseUsuario, setMesociclo }: UsuarioDatosProps) => {
-  const [usuario, setUsuario, updateUsuario] = useUsuario();
+  const [usuario, setUsuario, updateUsuario, isUpdating] = useUsuario();
 
   const onChangeNivel = (value: string) => {
-    setUsuario({ ...usuario, nivel: Niveles.filter((n) => n.idNivel.toString() === value)[0] });
+    setUsuario({
+      ...usuario,
+      nivel: Niveles.filter((n) => n.idNivel.toString() === value)[0],
+    });
   };
 
   return usuario ? (
     <Flex direction="column" m={[1, 6]} p={[3, 4, 6]} bg="white" boxShadow="lg">
       <Flex direction="row" justify="flex-end" m={[1]}>
         <Spacer />
-        <CloseButton colorScheme="gray" size="sm" variant="ghost" onClick={onClickCloseUsuario}></CloseButton>
+        <CloseButton
+          colorScheme="gray"
+          size="sm"
+          variant="ghost"
+          onClick={onClickCloseUsuario}
+        ></CloseButton>
       </Flex>
       <Flex direction={["column", "column", "column", "row"]} pb={[1, 3]}>
         {/* Columna Avatar + Email + username + Nivel */}
@@ -58,7 +76,11 @@ const UsuarioDatos = ({ onClickCloseUsuario, setMesociclo }: UsuarioDatosProps) 
           </Flex>
           {/* Genero + Peso + Altura*/}
           <Flex direction={["column", "column", "row"]} w="full">
-            <InputLabeled value={usuario.genero.descripcion} label="Genero" isReadOnly></InputLabeled>
+            <InputLabeled
+              value={usuario.genero.descripcion}
+              label="Genero"
+              isReadOnly
+            ></InputLabeled>
             <Spacer p={[0, 0, 2]} my={[1, 1, 0]} />
             <NumberInputLabeled
               value={usuario.peso}
@@ -88,7 +110,9 @@ const UsuarioDatos = ({ onClickCloseUsuario, setMesociclo }: UsuarioDatosProps) 
             />
             <Spacer p={[0, 0, 2]} my={[1, 1, 0]} />
             <InputLabeled
-              value={usuario.fechaNacimiento ? new Date(usuario.fechaNacimiento)?.toLocaleString() : "-"}
+              value={
+                usuario.fechaNacimiento ? new Date(usuario.fechaNacimiento)?.toLocaleString() : "-"
+              }
               label="Fecha Nacimiento"
               isReadOnly
             ></InputLabeled>
@@ -100,7 +124,12 @@ const UsuarioDatos = ({ onClickCloseUsuario, setMesociclo }: UsuarioDatosProps) 
             ></InputLabeled>
           </Flex>
           <Box p={[1]} />
-          <SaveButton mx={[1, 1, 2]} onClick={() => updateUsuario(usuario)}>
+          <SaveButton
+            mx={[1, 1, 2]}
+            onClick={() => updateUsuario(usuario)}
+            isLoading={isUpdating}
+            loadingText="Actualizando..."
+          >
             Guardar Datos
           </SaveButton>
         </Stack>
@@ -118,18 +147,19 @@ const UsuarioDetail = () => {
   const [mesociclo, setMesociclo] = useState<Mesociclo | null>(null);
 
   return (
-    <Layout>
-      <Flex direction="column" flex="1">
-        {!mesociclo ? (
-          <UsuarioDatos onClickCloseUsuario={() => router.push("/usuarios")} setMesociclo={setMesociclo} />
-        ) : (
-          <MesocicloDetail
-            mesociclo={mesociclo}
-            onClickCloseMesociclo={() => setMesociclo(null)}
-          ></MesocicloDetail>
-        )}
-      </Flex>
-    </Layout>
+    <Flex direction="column" flex="1">
+      {!mesociclo ? (
+        <UsuarioDatos
+          onClickCloseUsuario={() => router.push("/usuarios")}
+          setMesociclo={setMesociclo}
+        />
+      ) : (
+        <MesocicloDetail
+          mesociclo={mesociclo}
+          onClickCloseMesociclo={() => setMesociclo(null)}
+        ></MesocicloDetail>
+      )}
+    </Flex>
   );
 };
 

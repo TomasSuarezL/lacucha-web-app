@@ -25,8 +25,13 @@ import {
   ModalOverlay,
   Spacer,
   Spinner,
+  FormLabel,
+  FormControl,
+  Switch,
+  SwitchProps,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { ControllerRenderProps, RefCallBack } from "react-hook-form";
 import { useQueryCache } from "../../hooks/useQueryCache";
 import { Ejercicio, PatronesMovimiento } from "../../models/Mesociclo";
 import { ejerciciosApi } from "../mesociclos/Ejercicios.api";
@@ -34,18 +39,24 @@ import { ejerciciosApi } from "../mesociclos/Ejercicios.api";
 interface InputLabeledProps extends InputProps {
   value: string;
   label: string;
-  isNumber?: boolean;
+  error?: string;
+  direction?: "row" | "column";
+  field?: ControllerRenderProps;
+  inputRef?: RefCallBack;
 }
 
-export const InputLabeled = ({
+export const InputLabeled: React.FC<InputLabeledProps> = ({
   value,
   onChange: onChange,
   label,
-  isNumber = false,
+  direction = "column",
+  field,
+  inputRef,
+  error,
   ...props
-}: InputLabeledProps) => {
+}) => {
   return (
-    <Flex direction="column" w="full">
+    <Flex direction={direction} w="full">
       <Text fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
         {label}
       </Text>
@@ -57,8 +68,15 @@ export const InputLabeled = ({
         bg="gray.100"
         borderRadius="0"
         size="sm"
+        ref={inputRef}
+        {...field}
         {...props}
       ></Input>
+      {error && (
+        <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
+          {error}
+        </Text>
+      )}
     </Flex>
   );
 };
@@ -66,16 +84,21 @@ export const InputLabeled = ({
 interface NumberInputLabeledProps extends NumberInputProps {
   value: number;
   label: string;
-  isNumber?: boolean;
+  error?: string;
   direction?: "row" | "column";
-  onChangeNumber: (valueAsString: string, valueAsNumber: number) => void;
+  onChangeNumber?: (valueAsString: string, valueAsNumber: number) => void;
+  field?: ControllerRenderProps;
+  inputRef?: RefCallBack;
 }
 
 export const NumberInputLabeled = ({
   value,
   label,
+  error,
   onChangeNumber,
   direction = "column",
+  field,
+  inputRef,
   ...props
 }: NumberInputLabeledProps) => {
   return (
@@ -92,6 +115,9 @@ export const NumberInputLabeled = ({
           bg="gray.100"
           borderRadius="0"
           size="sm"
+          ref={inputRef}
+          alignSelf={direction === "row" ? "center" : ""}
+          {...field}
           {...props}
         >
           <NumberInputField />
@@ -101,23 +127,64 @@ export const NumberInputLabeled = ({
           </NumberInputStepper>
         </NumberInput>
       </Flex>
-      {value === undefined || value === null ? (
+      {value === undefined ||
+        (value === null && (
+          <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
+            Valor inválido
+          </Text>
+        ))}
+      {error && (
         <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
-          Valor inválido
+          {error}
         </Text>
-      ) : (
-        ""
       )}
     </Flex>
   );
 };
 
+interface SwitchLabeledProps extends SwitchProps {
+  label: string;
+  direction?: "row" | "column";
+  field?: ControllerRenderProps;
+  inputRef?: RefCallBack;
+}
+
+export const SwitchLabeled = ({
+  isChecked,
+  onChange: onChange,
+  label,
+  direction = "column",
+  field,
+  inputRef,
+  ...props
+}: SwitchLabeledProps) => {
+  return (
+    <FormControl display="flex" flex-direction={direction} alignItems="center" py={[1, 2]}>
+      <FormLabel htmlFor={`switch-${label}`} fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
+        {label}
+      </FormLabel>
+      <Switch
+        id={`switch-${label}`}
+        onChange={onChange}
+        isChecked={isChecked}
+        ref={inputRef}
+        {...field}
+        {...props}
+        ml={[2, 3]}
+      />
+    </FormControl>
+  );
+};
+
 interface SelectLabeledProps extends SelectProps {
-  value: string | number;
+  value: any;
   label: string;
   onChange: React.ChangeEventHandler<HTMLSelectElement>;
   options: { key: string | number; value: string | number; description: string }[];
   defaultOption?: string;
+  direction?: "row" | "column";
+  field?: ControllerRenderProps;
+  inputRef?: RefCallBack;
 }
 
 export const SelectLabeled: React.FC<SelectLabeledProps> = ({
@@ -126,14 +193,25 @@ export const SelectLabeled: React.FC<SelectLabeledProps> = ({
   onChange,
   options,
   defaultOption,
+  direction = "column",
+  field,
+  inputRef,
   ...props
 }) => {
   return (
-    <Flex direction="column" w="full">
+    <Flex direction={direction} w="full">
       <Text fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
         {label}
       </Text>
-      <Select value={value || "0"} onChange={onChange} bg="gray.100" size="sm" {...props}>
+      <Select
+        value={value || "0"}
+        onChange={onChange}
+        bg="gray.100"
+        size="sm"
+        ref={inputRef}
+        {...field}
+        {...props}
+      >
         {defaultOption && (
           <option key="0" value="0" selected>
             {defaultOption}
@@ -179,6 +257,7 @@ export const DatePickerLabeled: React.FC<DatePickerLabeledProps> = ({
 };
 
 interface RadioCardsLabeledProps extends FlexProps {
+  selectedValue: string;
   label: string;
   options: string[];
   onChangeHandler: (v: string) => void;
@@ -187,6 +266,7 @@ interface RadioCardsLabeledProps extends FlexProps {
 }
 
 export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
+  selectedValue,
   options,
   onChangeHandler: _onChange,
   label,
@@ -195,18 +275,18 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
   ...props
 }) => {
   const { getRootProps, getRadioProps } = useRadioGroup({
-    name: "framework",
-    defaultValue: "react",
+    name: "radio-cards",
+    defaultValue: selectedValue,
     onChange: _onChange,
   });
 
   const group = getRootProps();
 
-  const RadioCard = (props) => {
+  const RadioCard: React.FC = ({ children, ...props }) => {
     const { getInputProps, getCheckboxProps } = useRadio(props);
 
-    const input = getInputProps();
-    const checkbox = getCheckboxProps();
+    const input: any = getInputProps();
+    const checkbox: any = getCheckboxProps();
 
     return (
       <Box as="label">
@@ -228,11 +308,12 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
           px={5}
           py={3}
         >
-          {props.children}
+          {children}
         </Box>
       </Box>
     );
   };
+
   return (
     <Flex direction={direction} w="full">
       <Text fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
@@ -240,7 +321,8 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
       </Text>
       <Stack direction={["column", "column", "row"]} {...group} {...props}>
         {options.map((value) => {
-          const radio = getRadioProps({ value });
+          const radio: any = getRadioProps({ value });
+          radio.isChecked = radio.value === selectedValue;
           return (
             <RadioCard key={value} {...radio}>
               {value}
@@ -282,74 +364,6 @@ export const EjercicioSelectLabeled: React.FC<EjercicioSelectLabeledProps> = ({
     setIsOpen(false);
   };
 
-  const EjercicioModal: React.FC<{
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (ejercicio: Ejercicio) => void;
-    patrones: string[];
-  }> = ({ isOpen, onClose, onSave, patrones }) => {
-    const [ejercicio, setEjercicio] = useState<Ejercicio>(null);
-    const [patron, setPatron] = useState(patrones[0]);
-    const { data, isLoading, isError, error, isSuccess } = useQueryCache<Ejercicio[]>(
-      ["ejercicios", patron],
-      () => ejerciciosApi.getEjercicios(patron)
-    );
-
-    useEffect(() => {
-      isSuccess &&
-        setEjercicio({
-          ...data[0],
-        });
-    }, [data]);
-
-    const onChangeEjercicio = (ejercicio: Ejercicio) => {
-      setEjercicio({ ...ejercicio });
-    };
-
-    return (
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Editar Ejercicio</ModalHeader>
-          {isError ? (
-            <Text>{error.toString()}</Text>
-          ) : (
-            <ModalBody>
-              <SelectLabeled
-                label="Patrón"
-                value={patron}
-                onChange={(e) => setPatron(e.target.value)}
-                options={patrones.map((p) => ({ key: p, value: p, description: p }))}
-              />
-              <Spacer my={[1, 2]} />
-              {isLoading ? (
-                <Spinner />
-              ) : (
-                <SelectLabeled
-                  label="Ejercicio"
-                  value={ejercicio?.idEjercicio || 0}
-                  onChange={(ev) =>
-                    onChangeEjercicio(data.filter((e) => e.idEjercicio.toString() === ev.target.value)[0])
-                  }
-                  options={data.map((e) => ({ key: e.nombre, value: e.idEjercicio, description: e.nombre }))}
-                />
-              )}
-              <Spacer my={[1, 2]} />
-            </ModalBody>
-          )}
-          <ModalFooter>
-            <Button colorScheme="green" mr={3} onClick={(_e) => onSave(ejercicio)}>
-              Guardar
-            </Button>
-            <Button variant="ghost" onClick={onClose}>
-              Cerrar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    );
-  };
-
   return (
     <Flex direction={["column"]} {...props}>
       <Text fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
@@ -362,13 +376,88 @@ export const EjercicioSelectLabeled: React.FC<EjercicioSelectLabeledProps> = ({
         {ejercicio === undefined || ejercicio === null ? "Seleccionar un Ejercicio" : ""}
       </Text>
       {isOpen && (
-        <EjercicioModal
+        <EjercicioInputModal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           onSave={(ejercicio) => onSave(ejercicio)}
-          patrones={patrones ? patrones : PatronesMovimiento}
+          patrones={patrones ? patrones : [...PatronesMovimiento]}
         />
       )}
     </Flex>
+  );
+};
+
+export const EjercicioInputModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (ejercicio: Ejercicio) => void;
+  patrones: string[];
+  ejercicioSelected?: Ejercicio;
+}> = ({ isOpen, onClose, onSave, patrones, ejercicioSelected }) => {
+  const [ejercicio, setEjercicio] = useState<Ejercicio | null>(ejercicioSelected || null);
+  const [patron, setPatron] = useState((ejercicioSelected?.patron as string) || patrones[0]);
+  const { data, isLoading, isError, error, isSuccess } = useQueryCache<Ejercicio[]>(
+    ["ejercicios", patron],
+    () => ejerciciosApi.getEjercicios(patron)
+  );
+
+  useEffect(() => {
+    isSuccess &&
+      setEjercicio({
+        ...(ejercicioSelected || data[0]),
+      });
+  }, [data]);
+
+  const onChangeEjercicio = (ejercicio: Ejercicio) => {
+    setEjercicio({ ...ejercicio });
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Editar Ejercicio</ModalHeader>
+        {isError ? (
+          <Text>{error.toString()}</Text>
+        ) : (
+          <ModalBody>
+            <SelectLabeled
+              label="Patrón"
+              value={patron}
+              onChange={(e) => setPatron(e.target.value)}
+              options={patrones.map((p) => ({ key: p, value: p, description: p }))}
+            />
+            <Spacer my={[1, 2]} />
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <SelectLabeled
+                label="Ejercicio"
+                value={ejercicio?.idEjercicio || 0}
+                onChange={(ev) =>
+                  onChangeEjercicio(
+                    data.filter((e) => e.idEjercicio.toString() === ev.target.value)[0]
+                  )
+                }
+                options={data.map((e) => ({
+                  key: e.nombre,
+                  value: e.idEjercicio,
+                  description: e.nombre,
+                }))}
+              />
+            )}
+            <Spacer my={[1, 2]} />
+          </ModalBody>
+        )}
+        <ModalFooter>
+          <Button colorScheme="green" mr={3} onClick={(_e) => onSave(ejercicio)}>
+            Guardar
+          </Button>
+          <Button variant="ghost" onClick={onClose}>
+            Cerrar
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
