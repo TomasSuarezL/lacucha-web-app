@@ -18,7 +18,6 @@ import { Mesociclo } from "../../../models/Mesociclo";
 import { Niveles } from "../../../types/Usuario.type";
 import { useRouter } from "next/router";
 import { useUsuario } from "../../../hooks/useUsuario";
-import Layout from "../../../components/shared/Layout";
 
 interface UsuarioDatosProps {
   onClickCloseUsuario: () => void;
