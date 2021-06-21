@@ -22,9 +22,10 @@ const config = {
   measurementId: "G-QKB7JT11D3",
 };
 
-if (typeof window !== "undefined" && !firebase.apps.length) {
+if (!firebase.apps.length) {
   firebase.initializeApp(config);
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+  typeof window !== "undefined" &&
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 }
 
 const AuthContext =
