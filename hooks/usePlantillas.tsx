@@ -1,58 +1,58 @@
 import { AxiosError } from "axios";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { ejerciciosApi } from "../apis/Ejercicio.api";
-import { Ejercicio } from "../models/Ejercicio";
+import { plantillasApi } from "../apis/Plantillas.api";
+import { Plantilla } from "../models/Plantilla";
 import { useError } from "./useError";
 
-export const useEjercicios = () => {
+export const usePlantillas = () => {
   const queryClient = useQueryClient();
   const { setError, clearError } = useError();
 
-  const data = useQuery<Ejercicio[]>(["ejercicios"], () => ejerciciosApi.getEjercicios(), {
+  const data = useQuery<Plantilla[]>(["plantillas"], () => plantillasApi.getPlantillas(), {
     refetchOnWindowFocus: false,
     refetchInterval: 1000 * 60 * 15, // 15 min
     staleTime: 1000 * 60 * 60 * 15, // 15 min
   });
 
-  const updateEjercicioMutation = useMutation(
-    (ejercicio: Ejercicio) => ejerciciosApi.putEjercicio(ejercicio),
+  const updatePlantillaMutation = useMutation(
+    (plantilla: Plantilla) => plantillasApi.putPlantilla(plantilla),
     {
       onError: (err: AxiosError) => {
         console.error(err.response);
         setError({
-          message: "No se pudo actualizar el ejercicio.",
+          message: "No se pudo actualizar la plantilla.",
           isError: true,
           showContent: true,
         });
       },
       onSuccess: (data, variables, context) => {
         clearError();
-        queryClient.setQueryData<Ejercicio[]>(["ejercicios"], (old) => {
-          return old.map((e) => (e.idEjercicio === data.idEjercicio ? data : e));
+        queryClient.setQueryData<Plantilla[]>(["plantillas"], (old) => {
+          return old.map((e) => (e.idPlantilla === data.idPlantilla ? data : e));
         });
       },
     }
   );
 
-  const createEjercicioMutation = useMutation(
-    (ejercicio: Ejercicio) => ejerciciosApi.postEjercicio(ejercicio),
+  const createPlantillaMutation = useMutation(
+    (plantilla: Plantilla) => plantillasApi.postPlantilla(plantilla),
     {
       onError: (err: AxiosError) => {
         console.error(err.response);
         setError({
-          message: "No se pudo crear el ejercicio.",
+          message: "No se pudo crear la plantilla.",
           isError: true,
           showContent: true,
         });
       },
       onSuccess: (data, variables, context) => {
         clearError();
-        queryClient.setQueryData<Ejercicio[]>(["ejercicios"], (old) => {
+        queryClient.setQueryData<Plantilla[]>(["plantillas"], (old) => {
           return [...old, data];
         });
       },
     }
   );
 
-  return { ...data, updateEjercicioMutation, createEjercicioMutation };
+  return { ...data, updatePlantillaMutation, createPlantillaMutation };
 };

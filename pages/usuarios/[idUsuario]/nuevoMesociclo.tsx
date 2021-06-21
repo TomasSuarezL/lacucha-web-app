@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { plainToClass } from "class-transformer";
 import {
@@ -17,17 +17,18 @@ import {
   Text,
 } from "@chakra-ui/react";
 import Layout from "../../../components/shared/Layout";
-import { Mesociclo, Sesion } from "../../../models/Mesociclo";
+import { Mesociclo } from "../../../models/Mesociclo";
 import Link from "next/link";
 import { MesocicloNuevoForm } from "../../../components/mesociclos/MesocicloNuevoForm";
 import { SesionDetail } from "../../../components/mesociclos/SesionDetail";
-import { mesociclosApi } from "../../../components/mesociclos/Mesociclo.api";
+import { mesociclosApi } from "../../../apis/Mesociclo.api";
 import { useError } from "../../../hooks/useError";
 import { AxiosError } from "axios";
 import { useUsuario } from "../../../hooks/useUsuario";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useMesociclos } from "../../../hooks/useMesociclos";
 import { SaveButton } from "../../../components/shared/Buttons";
+import { Sesion } from "../../../models/Sesion";
 
 const NuevoMesociclo = ({ usuario }) => {
   const router = useRouter();

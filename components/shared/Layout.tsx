@@ -2,7 +2,6 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
-  Box,
   Center,
   CloseButton,
   Flex,

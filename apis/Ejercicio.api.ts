@@ -1,9 +1,11 @@
-import { Ejercicio } from "../../models/Mesociclo";
-import { api } from "../../services/api";
+import { Ejercicio } from "../models/Ejercicio";
+import { api } from "../services/api";
 
 export const ejerciciosApi = {
   getEjercicios: async (patrones?: string) => {
-    const { data } = await api.get<Ejercicio[]>(`/ejercicios?${patrones ? `patrones=${patrones}` : ""}`);
+    const { data } = await api.get<Ejercicio[]>(
+      `/ejercicios?${patrones ? `patrones=${patrones}` : ""}`
+    );
     return data;
   },
   putEjercicio: async (ejercicio: Ejercicio) => {

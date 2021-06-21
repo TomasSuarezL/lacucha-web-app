@@ -15,7 +15,7 @@ import { SaveButton } from "../../../components/shared/Buttons";
 import { InputLabeled, NumberInputLabeled, SelectLabeled } from "../../../components/shared/Inputs";
 import { UsuarioMesociclos } from "../../../components/usuarios/UsuarioMesociclos";
 import { Mesociclo } from "../../../models/Mesociclo";
-import { Niveles } from "../../../types/Usuario.type";
+import { Niveles } from "../../../models/Usuario";
 import { useRouter } from "next/router";
 import { useUsuario } from "../../../hooks/useUsuario";
 

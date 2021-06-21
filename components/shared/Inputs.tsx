@@ -32,9 +32,10 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { ControllerRenderProps, RefCallBack } from "react-hook-form";
+import { ejerciciosApi } from "../../apis/Ejercicio.api";
 import { useQueryCache } from "../../hooks/useQueryCache";
-import { Ejercicio, PatronesMovimiento } from "../../models/Mesociclo";
-import { ejerciciosApi } from "../mesociclos/Ejercicios.api";
+import { Ejercicio } from "../../models/Ejercicio";
+import { PatronesMovimiento } from "../../models/PatronMovimiento";
 
 interface InputLabeledProps extends InputProps {
   value: string;

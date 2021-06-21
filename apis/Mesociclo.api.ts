@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
-import { Mesociclo } from "../../models/Mesociclo";
-import { api } from "../../services/api";
+import { Mesociclo } from "../models/Mesociclo";
+import { api } from "../services/api";
 
 export const mesociclosApi = {
   postMesociclo: async (mesociclo: Mesociclo) => {

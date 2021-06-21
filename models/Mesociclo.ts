@@ -1,9 +1,12 @@
 import "reflect-metadata";
 import { plainToClass, Type } from "class-transformer";
-import { Nivel, Usuario } from "../types/Usuario.type";
-import { immerable } from "immer";
-import { ejerciciosApi } from "../components/mesociclos/Ejercicios.api";
+import { Nivel, Usuario } from "./Usuario";
 import { addWeeks, differenceInWeeks, parseISO } from "date-fns";
+import { Ejercicio } from "./Ejercicio";
+import { Sesion } from "./Sesion";
+import { PatronesMovimiento } from "./PatronMovimiento";
+import { Bloque } from "./Bloque";
+import { ejerciciosApi } from "../apis/Ejercicio.api";
 
 export class Mesociclo {
   idMesociclo: number;
@@ -41,28 +44,6 @@ export class Mesociclo {
   estaActivo(): boolean {
     return this.estado.idEstadoMesociclo === 1;
   }
-
-  // /* DELTE THIS METHOD FOR INIT FOR TESTING */
-  // async initMesociclo() {
-  //   this.organizacion = Organizaciones[0];
-  //   this.objetivo = Objetivos[0];
-  //   this.principalTrenInferior = {
-  //     idEjercicio: 1,
-  //     nombre: "Traditional Push-ups",
-  //     patron: "Empuje",
-  //     urlVideo: "",
-  //   };
-  //   this.principalTrenSuperior = {
-  //     idEjercicio: 1,
-  //     nombre: "Traditional Push-ups",
-  //     patron: "Empuje",
-  //     urlVideo: "",
-  //   };
-  //   this.semanasPorMesociclo = 2;
-  //   this.sesionesPorSemana = 2;
-
-  //   this.sesiones = await this.generarSesiones();
-  // }
 
   cancelar(): Mesociclo {
     this.estado = { idEstadoMesociclo: 3, descripcion: "Cancelado" };
@@ -180,77 +161,3 @@ export const Organizaciones: Organizacion[] = [
   { idOrganizacion: 2, descripcion: "Tren Superior / Tren Inferior" },
   { idOrganizacion: 3, descripcion: "Combinado" },
 ];
-export class Sesion {
-  [immerable] = true;
-
-  idSesion: number;
-  idMesociclo: number;
-  numSesion: number;
-  bloques: Bloque[];
-  fechaEmpezado: Date;
-  fechaFinalizado?: Date;
-  creadoEn: Date;
-  actualizadoEn?: Date;
-
-  constructor(numSesion?: number, idMesociclo?: number) {
-    this.idMesociclo = idMesociclo;
-    this.numSesion = numSesion;
-    this.bloques = [];
-    this.creadoEn = new Date();
-    let _fechaEmpezado = new Date();
-    _fechaEmpezado.setUTCHours(12);
-    this.fechaEmpezado = _fechaEmpezado;
-  }
-
-  estaFinalizada(): boolean {
-    return !!this.fechaFinalizado;
-  }
-
-  finalizar(): void {
-    this.fechaFinalizado = new Date();
-  }
-
-  shiftDate(offset: number) {
-    this.fechaEmpezado.setDate(this.fechaEmpezado.getDate() + offset);
-  }
-}
-
-export interface Bloque {
-  idBloque?: number;
-  numBloque: number;
-  series: number;
-  ejercicios: EjerciciosXBloque[];
-  creadoEn: Date;
-}
-
-export interface EjerciciosXBloque {
-  idEjerciciosxbloque?: number;
-  numEjercicio: number;
-  repeticiones: number;
-  carga: number;
-  ejercicio: Ejercicio;
-}
-
-export interface Ejercicio {
-  idEjercicio: number;
-  nombre: string;
-  patron: string | PatronMovimiento;
-  urlVideo: string;
-  pesoInicial: number;
-  esTemporal: boolean;
-}
-
-export interface PatronMovimiento {
-  idPatron: number;
-  descripcion: string;
-}
-
-export const PatronesMovimiento = <const>["Empuje", "Tracción", "Rodilla", "Cadera", "Core"];
-
-export const PatronesMovimientoMap = {
-  Empuje: { idPatron: 1, descripcion: "Empuje" },
-  Tracción: { idPatron: 5, descripcion: "Tracción" },
-  Rodilla: { idPatron: 2, descripcion: "Rodilla" },
-  Cadera: { idPatron: 4, descripcion: "Cadera" },
-  Core: { idPatron: 3, descripcion: "Core" },
-};

@@ -1,7 +1,7 @@
 import { plainToClass } from "class-transformer";
 import { Mesociclo } from "../../models/Mesociclo";
 import { api } from "../../services/api";
-import { Usuario } from "../../types/Usuario.type";
+import { Usuario } from "../../models/Usuario";
 
 export const usuariosApi = {
   getUsuario: async (uid: string) => {

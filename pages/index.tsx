@@ -13,7 +13,7 @@ import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import Layout from "../components/shared/Layout";
 import DataField from "../components/shared/DataField";
-import { User } from "../types/Usuario.type";
+import { User } from "../models/Usuario";
 
 export default function Perfil() {
   const auth = useAuth();

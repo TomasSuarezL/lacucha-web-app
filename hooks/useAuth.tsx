@@ -7,7 +7,7 @@ import nookies from "nookies";
 import { useError } from "./useError";
 import { api } from "../services/api";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
-import { User, UserFirebase } from "../types/Usuario.type";
+import { User, UserFirebase } from "../models/Usuario";
 
 // Based on the example on https://usehooks.com/useAuth/
 
@@ -104,7 +104,8 @@ export const useFirebaseUser = () => {
       } else {
         console.log("Id Token Changed");
         const userToken = await user.getIdToken();
-        state.user && dispatch({ type: "USER_SUCCESS", payload: { ...state.user, idToken: userToken } });
+        state.user &&
+          dispatch({ type: "USER_SUCCESS", payload: { ...state.user, idToken: userToken } });
         api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
         nookies.set(undefined, "token", userToken, { path: "/" });
       }

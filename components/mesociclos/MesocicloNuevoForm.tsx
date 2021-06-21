@@ -1,15 +1,15 @@
 import { Flex, Spacer, VStack, Spinner, Text, Button } from "@chakra-ui/react";
 import { plainToClass } from "class-transformer";
 import React, { useState } from "react";
+import { Ejercicio } from "../../models/Ejercicio";
 import {
-  Ejercicio,
   Mesociclo,
   Objetivo,
   Objetivos,
   Organizacion,
   Organizaciones,
-  Sesion,
 } from "../../models/Mesociclo";
+import { Sesion } from "../../models/Sesion";
 import { SaveButton } from "../shared/Buttons";
 import { RadioCardsLabeled, NumberInputLabeled, EjercicioSelectLabeled } from "../shared/Inputs";
 import { SesionesTable } from "./SesionTable";
