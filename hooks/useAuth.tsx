@@ -22,9 +22,10 @@ const config = {
   measurementId: "G-QKB7JT11D3",
 };
 
-if (typeof window !== "undefined" && !firebase.apps.length) {
+if (!firebase.apps.length) {
   firebase.initializeApp(config);
-  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+  typeof window !== "undefined" &&
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 }
 
 const AuthContext =
@@ -104,7 +105,8 @@ export const useFirebaseUser = () => {
       } else {
         console.log("Id Token Changed");
         const userToken = await user.getIdToken();
-        state.user && dispatch({ type: "USER_SUCCESS", payload: { ...state.user, idToken: userToken } });
+        state.user &&
+          dispatch({ type: "USER_SUCCESS", payload: { ...state.user, idToken: userToken } });
         api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
         nookies.set(undefined, "token", userToken, { path: "/" });
       }

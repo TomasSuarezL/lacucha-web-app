@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Box, Button, Center, Divider, Flex, Input, Text } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Input } from "@chakra-ui/react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/app";
 import "firebase/auth";
