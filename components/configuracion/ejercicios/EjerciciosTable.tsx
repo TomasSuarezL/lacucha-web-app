@@ -1,13 +1,16 @@
 import { Box, Table, Thead, Tr, Th, Tbody, Td } from "@chakra-ui/react";
 import React from "react";
-import { Ejercicio } from "../../../models/Mesociclo";
+import { Ejercicio } from "../../../models/Ejercicio";
 
 interface EjerciciosTableProps {
   ejercicios: Ejercicio[];
   onClickEjercicio: (ejercicio: Ejercicio) => void;
 }
 
-export const EjerciciosTable: React.FC<EjerciciosTableProps> = ({ ejercicios, onClickEjercicio }) => {
+export const EjerciciosTable: React.FC<EjerciciosTableProps> = ({
+  ejercicios,
+  onClickEjercicio,
+}) => {
   return (
     <Box boxShadow="xl" bg="white" w="full" overflow="auto" flex="1">
       <Table variant="simple" size="md">

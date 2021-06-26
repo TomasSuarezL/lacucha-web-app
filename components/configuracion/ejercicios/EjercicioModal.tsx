@@ -10,8 +10,13 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Controller, useForm, useFormState } from "react-hook-form";
-import { Ejercicio, PatronesMovimientoMap } from "../../../models/Mesociclo";
-import { InputLabeled, NumberInputLabeled, SelectLabeled, SwitchLabeled } from "../../shared/Inputs";
+import {
+  InputLabeled,
+  NumberInputLabeled,
+  SelectLabeled,
+  SwitchLabeled,
+} from "../../shared/Inputs";
+import { PatronesMovimientoMap } from "../../../models/PatronMovimiento";
 
 export const EjercicioModal: React.FC<{
   isOpen: boolean;
@@ -62,7 +67,12 @@ export const EjercicioModal: React.FC<{
                 control={control}
                 defaultValue={ejercicioSelected.nombre || ""}
                 render={({ field: { ref, ...rest } }) => (
-                  <InputLabeled label="Nombre" inputRef={ref} {...rest} error={errors.nombre?.message} />
+                  <InputLabeled
+                    label="Nombre"
+                    inputRef={ref}
+                    {...rest}
+                    error={errors.nombre?.message}
+                  />
                 )}
                 rules={{ required: "Por favor completar" }}
               />
@@ -94,7 +104,12 @@ export const EjercicioModal: React.FC<{
                 control={control}
                 defaultValue={ejercicioSelected.esTemporal || false}
                 render={({ field: { ref, value, ...rest } }) => (
-                  <SwitchLabeled label="Es Temporal?" inputRef={ref} value={value.toString()} {...rest} />
+                  <SwitchLabeled
+                    label="Es Temporal?"
+                    inputRef={ref}
+                    value={value.toString()}
+                    {...rest}
+                  />
                 )}
               />
             </Stack>

@@ -2,11 +2,12 @@ import { useImmer } from "use-immer";
 import React, { useState } from "react";
 import { AiFillEdit, AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { Button, Divider, Flex, Spacer, Spinner, Stack, Text } from "@chakra-ui/react";
-import { Bloque, EjerciciosXBloque, Sesion } from "../../models/Mesociclo";
 import DataField from "../shared/DataField";
 import EjercicioSelectModal from "./EjercicioSelectModal";
 import { DeleteButton, SaveButton } from "../shared/Buttons";
 import { DatePickerLabeled, NumberInputLabeled } from "../shared/Inputs";
+import { Bloque, EjerciciosXBloque } from "../../models/Bloque";
+import { Sesion } from "../../models/Sesion";
 
 interface BloqueDetailProps {
   bloque: Bloque;

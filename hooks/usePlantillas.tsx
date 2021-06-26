@@ -54,5 +54,25 @@ export const usePlantillas = () => {
     }
   );
 
-  return { ...data, updatePlantillaMutation, createPlantillaMutation };
+  const deletePlantillaMutation = useMutation(
+    (plantilla: Plantilla) => plantillasApi.deletePlantilla(plantilla),
+    {
+      onError: (err: AxiosError) => {
+        console.error(err.response);
+        setError({
+          message: "No se pudo eliminar la plantilla.",
+          isError: true,
+          showContent: true,
+        });
+      },
+      onSuccess: (data, variables, context) => {
+        clearError();
+        queryClient.setQueryData<Plantilla[]>(["plantillas"], (old) => {
+          return old.filter((p) => p.idPlantilla !== variables.idPlantilla);
+        });
+      },
+    }
+  );
+
+  return { ...data, updatePlantillaMutation, createPlantillaMutation, deletePlantillaMutation };
 };

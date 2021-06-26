@@ -38,7 +38,7 @@ export default function Layout({ children }) {
         >
           <SideNav />
           {isError && showContent === false ? (
-            <Alert h={["8", "12"]} status="error">
+            <Alert h={["8", "12"]} m={[2, 3, 4]} flex={["0", "1"]} w={["auto"]} status="error">
               <AlertIcon />
               <AlertTitle mr={2}>{message}</AlertTitle>
             </Alert>
@@ -55,7 +55,7 @@ export default function Layout({ children }) {
             auth.user && (
               <Flex flex="1" p={[1, 2, 4]} direction="column" maxWidth="7xl" overflow="auto">
                 {isError && showContent && (
-                  <Alert h={["8", "12"]} status="error">
+                  <Alert minHeight={["8", "12"]} status="error">
                     <AlertIcon />
                     <AlertTitle mr={2}>{message}</AlertTitle>
                     <CloseButton

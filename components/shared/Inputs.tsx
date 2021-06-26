@@ -48,7 +48,7 @@ interface InputLabeledProps extends InputProps {
 
 export const InputLabeled: React.FC<InputLabeledProps> = ({
   value,
-  onChange: onChange,
+  onChange,
   label,
   direction = "column",
   field,
@@ -258,12 +258,14 @@ export const DatePickerLabeled: React.FC<DatePickerLabeledProps> = ({
 };
 
 interface RadioCardsLabeledProps extends FlexProps {
-  selectedValue: string;
   label: string;
   options: string[];
-  onChangeHandler: (v: string) => void;
+  selectedValue?: string;
+  onChangeHandler?: (v: string) => void;
   direction?: "row" | "column";
   isInvalid?: boolean;
+  field?: ControllerRenderProps;
+  inputRef?: RefCallBack;
 }
 
 export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
@@ -273,6 +275,8 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
   label,
   direction = "column",
   isInvalid = false,
+  field,
+  inputRef,
   ...props
 }) => {
   const { getRootProps, getRadioProps } = useRadioGroup({
@@ -291,7 +295,7 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
 
     return (
       <Box as="label">
-        <input {...input} />
+        <input {...input} ref={inputRef} />
         <Box
           {...checkbox}
           cursor="pointer"
@@ -320,7 +324,7 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
       <Text fontSize={["xs", "sm"]} fontWeight="bold" m={[1, 1]}>
         {label}
       </Text>
-      <Stack direction={["column", "column", "row"]} {...group} {...props}>
+      <Stack direction={["column", "column", "row"]} {...group} {...props} {...field}>
         {options.map((value) => {
           const radio: any = getRadioProps({ value });
           radio.isChecked = radio.value === selectedValue;
@@ -331,13 +335,9 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
           );
         })}
       </Stack>
-      {isInvalid ? (
+      {isInvalid && (
         <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
           Por favor seleccionar una opción
-        </Text>
-      ) : (
-        <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]}>
-          Seleccionar una opción
         </Text>
       )}
     </Flex>

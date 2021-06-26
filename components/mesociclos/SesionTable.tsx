@@ -1,6 +1,6 @@
 import { Box, Table, Thead, Tr, Th, Tbody, Td } from "@chakra-ui/react";
 import React from "react";
-import { Sesion } from "../../models/Mesociclo";
+import { Sesion } from "../../models/Sesion";
 
 export interface SesionTableProps {
   sesiones: Sesion[];
@@ -24,7 +24,7 @@ export const SesionesTable = ({ sesiones, setSesion }: SesionTableProps) => {
         <Tbody>
           {sesiones.map((s) => (
             <Tr
-              key={s.fechaEmpezado.toString()}
+              key={s.numSesion?.toString() + s.creadoEn?.toString()}
               cursor="pointer"
               _hover={{ bg: "gray.100" }}
               onClick={() => setSesion(s)}

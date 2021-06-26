@@ -1,7 +1,7 @@
 import { Stack, Button, Text, Spacer } from "@chakra-ui/react";
 import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import { PatronesMovimiento } from "../../../models/Mesociclo";
+import { PatronesMovimiento } from "../../../models/PatronMovimiento";
 import { InputLabeled, SelectLabeled } from "../../shared/Inputs";
 
 export interface EjerciciosControls {
