@@ -14,6 +14,7 @@ import {
   Flex,
   Spinner,
   Stack,
+  Text,
 } from "@chakra-ui/react";
 import ConfiguracionLayout from "../../../components/configuracion/ConfiguracionLayout";
 import { api } from "../../../services/api";
@@ -30,12 +31,14 @@ const PlantillasControls = () => {
   const router = useRouter();
   return (
     <Button onClick={() => router.push("/configuracion/plantillas/nuevaPlantilla")}>
-      <AiOutlinePlus /> Nueva Plantilla
+      <AiOutlinePlus />
+      <Text ml={[1, 2]}>Nueva Plantilla</Text>
     </Button>
   );
 };
 
 export default function ConfiguracionPlantillasPage() {
+  const router = useRouter();
   const cancelRef = React.useRef();
   const { setError } = useError();
   const { data: plantillas, isLoading, error, isError, deletePlantillaMutation } = usePlantillas();
@@ -60,10 +63,12 @@ export default function ConfiguracionPlantillasPage() {
     );
   }
 
+  console.log(plantillas);
+
   return (
     <ConfiguracionLayout>
       <Stack direction="column" spacing={[2, 3]} p={[1, 2, 3]} w="full">
-        {isLoading ? (
+        {isLoading || deletePlantillaMutation.isLoading ? (
           <Flex w="full" justify="center">
             <Spinner />
           </Flex>
@@ -72,7 +77,9 @@ export default function ConfiguracionPlantillasPage() {
             <PlantillasControls />
             <PlantillasTable
               plantillas={plantillas}
-              onClickPlantilla={(plantilla) => setPlantilla(plantilla)}
+              onClickPlantilla={(plantilla) =>
+                router.push(`/configuracion/plantillas/${plantilla.idPlantilla}`)
+              }
               onClickDeletePlantilla={(plantilla) => onClickDeletePlantilla(plantilla)}
             />
           </>

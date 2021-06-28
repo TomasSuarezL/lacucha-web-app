@@ -46,7 +46,13 @@ export const PlantillasTable: React.FC<PlantillasTableProps> = ({
                 {p.sesionesPorSemana}
               </Td>
               <Td opacity={[0]} _groupHover={{ opacity: 1 }}>
-                <CloseButton size={"sm"} onClick={() => onClickDeletePlantilla(p)} />
+                <CloseButton
+                  size={"sm"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClickDeletePlantilla(p);
+                  }}
+                />
               </Td>
             </Tr>
           ))}

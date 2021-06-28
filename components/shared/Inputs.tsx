@@ -284,7 +284,6 @@ export const RadioCardsLabeled: React.FC<RadioCardsLabeledProps> = ({
     defaultValue: selectedValue,
     onChange: _onChange,
   });
-
   const group = getRootProps();
 
   const RadioCard: React.FC = ({ children, ...props }) => {

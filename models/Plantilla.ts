@@ -15,7 +15,6 @@ export class Plantilla {
 }
 
 export class SesionXPlantilla {
-  idSesionXPlantilla?: number;
-  idPlantilla?: number;
+  idSesionxplantilla?: number;
   sesion: Sesion;
 }

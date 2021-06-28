@@ -1,5 +1,16 @@
-import { Box, CloseButton, Flex, Heading, Spacer, Spinner, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  CloseButton,
+  Flex,
+  Heading,
+  Spacer,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { addDays } from "date-fns";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useForm, useFormState, Controller } from "react-hook-form";
 import { Objetivos, Organizaciones } from "../../../models/Mesociclo";
@@ -27,13 +38,17 @@ export const PlantillaForm: React.FC<PlantillaFormProps> = ({
   onSubmitForm,
   isLoading = false,
 }) => {
+  const router = useRouter();
   const { handleSubmit, control, watch } = useForm();
   const { errors } = useFormState({
     control,
   });
-  const _form = watch(["objetivo", "organizacion"]);
-  const sesionesPorSemana = watch("sesionesPorSemana", 0);
-  const [sesiones, setSesiones] = useState<SesionXPlantilla[]>([]);
+  const _form = watch(["objetivo", "organizacion"], {
+    objetivo: plantilla?.objetivo.descripcion || Objetivos[0].descripcion,
+    organizacion: plantilla?.organizacion.descripcion || Organizaciones[0].descripcion,
+  });
+  const sesionesPorSemana = watch("sesionesPorSemana", plantilla?.sesionesPorSemana || 0);
+  const [sesiones, setSesiones] = useState<SesionXPlantilla[]>(plantilla?.sesiones || []);
   const [selectedSesion, setSelectedSesion] = useState<Sesion | null>(null);
 
   useEffect(() => {
@@ -75,9 +90,9 @@ export const PlantillaForm: React.FC<PlantillaFormProps> = ({
 
   if (selectedSesion) {
     return (
-      <Stack direction="column">
+      <Stack direction="column" p={[1, 2, 4]}>
         <Flex direction="row">
-          <Heading as="h4" fontSize={["xl", "2xl"]}>
+          <Heading as="h5" fontWeight={["light"]} fontSize={["lg", "xl"]}>
             Editar Sesion
           </Heading>
           <Spacer />
@@ -92,7 +107,7 @@ export const PlantillaForm: React.FC<PlantillaFormProps> = ({
       </Stack>
     );
   }
-  console.log("Rerender");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Spinner margin="auto" display={Object.entries(_form).length === 0 ? "flex" : "none"} />
@@ -102,9 +117,6 @@ export const PlantillaForm: React.FC<PlantillaFormProps> = ({
         align="start"
         display={Object.entries(_form).length === 0 ? "none" : "flex"}
       >
-        <Heading as="h4" fontSize={["xl", "2xl"]}>
-          Nueva Plantilla
-        </Heading>
         <Controller
           name="nombre"
           control={control}
@@ -181,11 +193,16 @@ export const PlantillaForm: React.FC<PlantillaFormProps> = ({
         </Text>
         <Box p={[1, 2]} />
         <SesionesTable
-          sesiones={plantilla?.sesiones.map((s) => s.sesion) || sesiones.map((s) => s.sesion)}
+          sesiones={sesiones.map((s) => s.sesion)}
           setSesion={(sesion: Sesion) => setSelectedSesion(sesion)}
         />
         <Spacer p={[1]}></Spacer>
-        <SaveButton type="submit">Guardar</SaveButton>
+        <Flex direction="row" alignItems={"center"}>
+          <SaveButton type="submit">Guardar</SaveButton>
+          <Button type="button" variant="ghost" size="sm" onClick={() => router.back()}>
+            Volver
+          </Button>
+        </Flex>
       </Stack>
     </form>
   );

@@ -8,7 +8,7 @@ export const usePlantillas = () => {
   const queryClient = useQueryClient();
   const { setError, clearError } = useError();
 
-  const data = useQuery<Plantilla[]>(["plantillas"], () => plantillasApi.getPlantillas(), {
+  const data = useQuery<Plantilla[]>(["plantillas"], async () => plantillasApi.getPlantillas(), {
     refetchOnWindowFocus: false,
     refetchInterval: 1000 * 60 * 15, // 15 min
     staleTime: 1000 * 60 * 60 * 15, // 15 min
@@ -73,6 +73,8 @@ export const usePlantillas = () => {
       },
     }
   );
+
+  console.log(data.data);
 
   return { ...data, updatePlantillaMutation, createPlantillaMutation, deletePlantillaMutation };
 };
