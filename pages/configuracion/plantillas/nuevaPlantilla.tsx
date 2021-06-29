@@ -18,8 +18,6 @@ export default function NuevaPlantillaPage() {
             <Heading as="h4" fontSize={["xl", "2xl"]}>
               Nueva Plantilla
             </Heading>
-            <Spacer />
-            <CloseButton onClick={() => router.back()} />
           </Flex>
           <PlantillaForm
             onSubmitForm={(plantilla: Plantilla) => createPlantillaMutation.mutate(plantilla)}
