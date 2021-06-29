@@ -17,6 +17,7 @@ import {
   SwitchLabeled,
 } from "../../shared/Inputs";
 import { PatronesMovimientoMap } from "../../../models/PatronMovimiento";
+import { Ejercicio } from "../../../models/Ejercicio";
 
 export const EjercicioModal: React.FC<{
   isOpen: boolean;
