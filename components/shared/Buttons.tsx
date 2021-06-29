@@ -2,7 +2,7 @@ import { Button, ButtonProps } from "@chakra-ui/react";
 import React from "react";
 
 interface SaveButtonProps extends ButtonProps {
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const SaveButton: React.FC<SaveButtonProps> = ({ children, onClick, ...props }) => {

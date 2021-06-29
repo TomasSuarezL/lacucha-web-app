@@ -2,7 +2,12 @@ import React from "react";
 import Link from "next/link";
 import { Stack, Link as ChakraLink } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
-import { AiOutlineTeam, AiOutlineCalendar, AiOutlineBarChart, AiOutlineSetting } from "react-icons/ai";
+import {
+  AiOutlineTeam,
+  AiOutlineCalendar,
+  AiOutlineBarChart,
+  AiOutlineSetting,
+} from "react-icons/ai";
 import { useRouter } from "next/router";
 
 const NavBarLink = ({ url, name, icon }) => {
@@ -16,7 +21,7 @@ const NavBarLink = ({ url, name, icon }) => {
         alignItems={["center"]}
         fontSize={["sm", "sm", , "medium"]}
         _hover={{ bg: "gray.200" }}
-        p={[0, 4]}
+        p={[1, 2, 3]}
         w="full"
         bg={"/" + router.asPath.split("/")[1] === url && "gray.100"}
       >
@@ -37,7 +42,7 @@ export default function NavBar() {
       px={[2, 2, 6, 6, 8]}
       py={[4, 16]}
       minWidth={[null, null, "2xs", "2xs"]}
-      spacing={["8px", "24px"]}
+      spacing={[0, 1, 2]}
     >
       <NavBarLink url="/usuarios" name="Usuarios" icon={AiOutlineTeam} />
       {/* <NavBarLink url="/mesociclos" name="Mesociclos" icon={AiOutlineCalendar} /> */}

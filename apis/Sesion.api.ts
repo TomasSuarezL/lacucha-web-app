@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
-import { Sesion } from "../../models/Mesociclo";
-import { api } from "../../services/api";
+import { Sesion } from "../models/Sesion";
+import { api } from "../services/api";
 
 export const sesionesApi = {
   putSesion: async (sesion: Sesion) => {

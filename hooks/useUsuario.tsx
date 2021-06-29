@@ -3,10 +3,15 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
-import { Usuario } from "../types/Usuario.type";
+import { Usuario } from "../models/Usuario";
 import { useError } from "./useError";
 
-export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: Usuario) => void, boolean] = () => {
+export const useUsuario: () => [
+  Usuario,
+  (usuario: Usuario) => void,
+  (usuario: Usuario) => void,
+  boolean
+] = () => {
   const router = useRouter();
   const { idUsuario } = router.query;
   const queryClient = useQueryClient();
@@ -19,7 +24,9 @@ export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: U
       const queries = queryClient.getQueryCache().findAll(["usuarios"]);
 
       if (queries.length > 0) {
-        const usuarios = queryClient.getQueryData<Usuario[] | Usuario>(queries[queries.length - 1]?.queryKey);
+        const usuarios = queryClient.getQueryData<Usuario[] | Usuario>(
+          queries[queries.length - 1]?.queryKey
+        );
         const _usuario = Array.isArray(usuarios)
           ? usuarios?.filter((u) => u.uuid.toString() === idUsuario)[0]
           : usuarios;
@@ -51,5 +58,10 @@ export const useUsuario: () => [Usuario, (usuario: Usuario) => void, (usuario: U
     },
   });
 
-  return [usuario, setUsuario, (usuario: Usuario) => updateUsuarioMutation.mutate(usuario), updateUsuarioMutation.isLoading];
+  return [
+    usuario,
+    setUsuario,
+    (usuario: Usuario) => updateUsuarioMutation.mutate(usuario),
+    updateUsuarioMutation.isLoading,
+  ];
 };

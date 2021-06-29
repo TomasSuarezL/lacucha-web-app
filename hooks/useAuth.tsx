@@ -1,13 +1,12 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import { createContext, useContext, useEffect, useReducer } from "react";
-import { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import nookies from "nookies";
 import { useError } from "./useError";
 import { api } from "../services/api";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
-import { User, UserFirebase } from "../types/Usuario.type";
+import { User, UserFirebase } from "../models/Usuario";
 
 // Based on the example on https://usehooks.com/useAuth/
 
@@ -28,12 +27,11 @@ if (!firebase.apps.length) {
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
 }
 
-const AuthContext =
-  createContext<{
-    user: User | UserFirebase;
-    loading: Boolean;
-    signout: () => Promise<void>;
-  }>(null);
+const AuthContext = createContext<{
+  user: User | UserFirebase;
+  loading: Boolean;
+  signout: () => Promise<void>;
+}>(null);
 
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().

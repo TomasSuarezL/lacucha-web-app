@@ -1,7 +1,7 @@
 import { Box, Table, Thead, Tr, Th, Tbody, Td } from "@chakra-ui/react";
 import Link from "next/link";
 import React from "react";
-import { Usuario } from "../../types/Usuario.type";
+import { Usuario } from "../../models/Usuario";
 
 interface UsuariosTableProps {
   usuarios: Usuario[];

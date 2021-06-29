@@ -8,6 +8,7 @@ import { useAuth } from "../hooks/useAuth";
 export default function Login() {
   const auth = useAuth();
 
+  console.log(auth);
   if (auth.user) Router.push("/");
 
   return (

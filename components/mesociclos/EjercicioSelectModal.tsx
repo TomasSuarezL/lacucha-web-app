@@ -12,10 +12,12 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { ejerciciosApi } from "../../apis/Ejercicio.api";
 import { useQueryCache } from "../../hooks/useQueryCache";
-import { Ejercicio, EjerciciosXBloque, PatronesMovimiento } from "../../models/Mesociclo";
+import { EjerciciosXBloque } from "../../models/Bloque";
+import { Ejercicio } from "../../models/Ejercicio";
+import { PatronesMovimiento } from "../../models/PatronMovimiento";
 import { NumberInputLabeled, SelectLabeled } from "../shared/Inputs";
-import { ejerciciosApi } from "./Ejercicios.api";
 
 interface EjercicioSelectModalProps {
   ejercicio: EjerciciosXBloque;

@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { ejerciciosApi } from "../components/mesociclos/Ejercicios.api";
-import { Ejercicio } from "../models/Mesociclo";
+import { ejerciciosApi } from "../apis/Ejercicio.api";
+import { Ejercicio } from "../models/Ejercicio";
 import { useError } from "./useError";
 
 export const useEjercicios = () => {

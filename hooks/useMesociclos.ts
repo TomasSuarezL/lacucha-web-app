@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from "react-query";
 import { plainToClass } from "class-transformer";
 import { usuariosApi } from "../components/usuarios/Usuarios.api";
-import { Mesociclo, Sesion } from "../models/Mesociclo";
+import { Mesociclo } from "../models/Mesociclo";
+import { Sesion } from "../models/Sesion";
 
 export const useMesociclos = (idUsuario: number) => {
   const queryClient = useQueryClient();

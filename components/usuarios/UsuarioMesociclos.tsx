@@ -17,7 +17,7 @@ import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useMesociclos } from "../../hooks/useMesociclos";
 import { Mesociclo } from "../../models/Mesociclo";
-import { Usuario } from "../../types/Usuario.type";
+import { Usuario } from "../../models/Usuario";
 
 interface MesocicloTableProps {
   mesociclos: Mesociclo[];

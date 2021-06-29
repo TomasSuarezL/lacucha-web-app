@@ -8,18 +8,13 @@ import { EjercicioModal } from "../../../components/configuracion/ejercicios/Eje
 import { EjerciciosControls } from "../../../components/configuracion/ejercicios/EjerciciosControls";
 import { EjerciciosTable } from "../../../components/configuracion/ejercicios/EjerciciosTable";
 import { useEjercicios } from "../../../hooks/useEjercicios";
-import { Ejercicio, PatronesMovimiento } from "../../../models/Mesociclo";
 import { api } from "../../../services/api";
-import { ejerciciosApi } from "../../../components/mesociclos/Ejercicios.api";
 import { GetServerSidePropsContext } from "next";
-
-interface EjerciciosControls {
-  search: string;
-  patron: typeof PatronesMovimiento[number] | "Todos";
-}
+import { Ejercicio } from "../../../models/Ejercicio";
+import { ejerciciosApi } from "../../../apis/Ejercicio.api";
 
 export default function ConfiguracionEjerciciosPage() {
-  const [controls, setControls] = useState({ search: "", patron: "Todos" });
+  const [controls, setControls] = useState<EjerciciosControls>({ search: "", patron: "Todos" });
   const {
     data: ejercicios,
     isLoading,

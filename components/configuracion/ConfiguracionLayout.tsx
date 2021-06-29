@@ -15,8 +15,7 @@ const ConfiguracionNavBarLink = ({ url, name }) => {
         alignItems={["center"]}
         fontSize={["sm", "sm", , "medium"]}
         _hover={{ bg: "gray.200" }}
-        w="full"
-        fontWeight={router.asPath === url && "bold"}
+        fontWeight={router.asPath.includes(url) && "bold"}
         px={[2, 4]}
         py={[1, 2]}
       >
@@ -28,7 +27,7 @@ const ConfiguracionNavBarLink = ({ url, name }) => {
 
 export default function ConfiguracionLayout({ children }) {
   return (
-    <Flex direction={["column", "column", "row"]} height="full" border="1px solid gray.100">
+    <Flex direction={["column", "column", "row"]} height="full">
       <Stack direction={["row", "row", "column"]} spacing={[4]} mr={[2, 4, 8]} mt={[1, 2, 4]}>
         <ConfiguracionNavBarLink url="/configuracion/ejercicios" name="Ejercicios" />
         <ConfiguracionNavBarLink url="/configuracion/plantillas" name="Plantillas" />
