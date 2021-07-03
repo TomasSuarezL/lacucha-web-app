@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { CloseButton, Flex, Heading, Progress, Spacer } from "@chakra-ui/react";
+import { Flex, Heading, Progress } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
@@ -37,8 +37,6 @@ const PlantillaEditor = ({ idPlantilla }: PlantillaEditorProps) => {
     router.push("/configuracion/plantillas");
     return <div></div>;
   }
-
-  console.log(plantilla);
 
   return !isLoading ? (
     <Flex direction="column" m={[1, 6]} p={[3, 4, 6]} bg="white" boxShadow="lg">

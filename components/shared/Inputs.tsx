@@ -214,7 +214,7 @@ export const SelectLabeled: React.FC<SelectLabeledProps> = ({
         {...props}
       >
         {defaultOption && (
-          <option key="0" value="0" selected>
+          <option key="0" value="0">
             {defaultOption}
           </option>
         )}

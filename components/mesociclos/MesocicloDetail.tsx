@@ -130,7 +130,7 @@ export const MesocicloDetail: React.FC<MesocicloDetailProps> = ({
       <Text fontSize={["xl", "2xl"]} fontWeight="semibold" mx={[2, 2, 4]} alignSelf="flex-start">
         {`Mesociclo del ${new Date(mesociclo.creadoEn).toLocaleDateString()} al ${
           mesociclo.fechaFinReal
-            ? mesociclo.fechaFinReal.toLocaleDateString()
+            ? new Date(mesociclo.fechaFinReal)?.toLocaleDateString()
             : mesociclo.getFechaFinalizacion().toLocaleDateString()
         }`}
       </Text>
