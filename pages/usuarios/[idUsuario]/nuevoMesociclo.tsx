@@ -17,6 +17,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Progress,
   Spacer,
   Spinner,
   Text,
@@ -204,5 +205,9 @@ const NuevoMesociclo = ({ usuario }) => {
 
 export default function NuevoMesocicloPage() {
   const [usuario, _] = useUsuario();
-  return usuario ? <NuevoMesociclo usuario={usuario} /> : <Spinner />;
+  return usuario ? (
+    <NuevoMesociclo usuario={usuario} />
+  ) : (
+    <Progress position="absolute" top="0" left="0" width="100vw" size="xs" isIndeterminate />
+  );
 }

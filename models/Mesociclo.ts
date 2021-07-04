@@ -45,6 +45,16 @@ export class Mesociclo {
   estaActivo(): boolean {
     return this.estado.idEstadoMesociclo === 1;
   }
+  esValido(): boolean {
+    return (
+      !!this.objetivo &&
+      !!this.organizacion &&
+      !!this.sesionesPorSemana &&
+      !!this.semanasPorMesociclo &&
+      !!this.principalTrenSuperior &&
+      !!this.principalTrenInferior
+    );
+  }
 
   cancelar(): Mesociclo {
     this.estado = { idEstadoMesociclo: 3, descripcion: "Cancelado" };
