@@ -12,11 +12,16 @@ import {
   Button,
   CloseButton,
   Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Progress,
   Spacer,
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import Layout from "../../../components/shared/Layout";
 import { Mesociclo } from "../../../models/Mesociclo";
 import Link from "next/link";
 import { MesocicloNuevoForm } from "../../../components/mesociclos/MesocicloNuevoForm";
@@ -29,6 +34,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { useMesociclos } from "../../../hooks/useMesociclos";
 import { SaveButton } from "../../../components/shared/Buttons";
 import { Sesion } from "../../../models/Sesion";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const NuevoMesociclo = ({ usuario }) => {
   const router = useRouter();
@@ -68,7 +74,7 @@ const NuevoMesociclo = ({ usuario }) => {
   const onSaveMesociclo = () => {
     mesociclo.usuario = usuario;
     mesociclo.nivel = usuario.nivel;
-    if (mesociclos.filter((m) => m.estaActivo()).length > 0) {
+    if (mesociclos.some((m) => m.estaActivo())) {
       setIsAlertOpen(true);
     } else {
       createMutation.mutate(mesociclo);
@@ -105,16 +111,27 @@ const NuevoMesociclo = ({ usuario }) => {
         <Text
           borderLeft="4px solid"
           borderColor="gray.200"
-          fontSize={["sm", "lg"]}
+          fontSize={["xs", "sm"]}
           pl={[1, 2, 3]}
           alignSelf="flex-start"
         >
           {usuario?.nombre} {usuario?.apellido}
         </Text>
         <Spacer />
-        <Button size="sm" mx={[1, 2]} onClick={onCopyMesociclo} isDisabled={!mesociclos}>
-          <AiOutlinePlus /> <Text ml={[1]}>Copiar Mesociclo Anterior</Text>
-        </Button>
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            size="sm"
+            aria-label="Options"
+            icon={<ChevronDownIcon />}
+            variant="outline"
+          />
+          <MenuList>
+            <MenuItem icon={<AiOutlinePlus />} onClick={onCopyMesociclo} isDisabled={!mesociclos}>
+              Copiar Mesociclo Anterior
+            </MenuItem>
+          </MenuList>
+        </Menu>
         {sesionEdit ? (
           <CloseButton
             colorScheme="gray"
@@ -188,5 +205,9 @@ const NuevoMesociclo = ({ usuario }) => {
 
 export default function NuevoMesocicloPage() {
   const [usuario, _] = useUsuario();
-  return usuario ? <NuevoMesociclo usuario={usuario} /> : <Spinner />;
+  return usuario ? (
+    <NuevoMesociclo usuario={usuario} />
+  ) : (
+    <Progress position="absolute" top="0" left="0" width="100vw" size="xs" isIndeterminate />
+  );
 }

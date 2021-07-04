@@ -1,12 +1,13 @@
 import "reflect-metadata";
 import { plainToClass, Type } from "class-transformer";
 import { Nivel, Usuario } from "./Usuario";
-import { addWeeks, differenceInWeeks, parseISO } from "date-fns";
+import { addWeeks, differenceInDays, differenceInWeeks, isAfter, parseISO } from "date-fns";
 import { Ejercicio } from "./Ejercicio";
 import { Sesion } from "./Sesion";
 import { PatronesMovimiento } from "./PatronMovimiento";
 import { Bloque } from "./Bloque";
 import { ejerciciosApi } from "../apis/Ejercicio.api";
+import { Plantilla } from "./Plantilla";
 
 export class Mesociclo {
   idMesociclo: number;
@@ -44,13 +45,23 @@ export class Mesociclo {
   estaActivo(): boolean {
     return this.estado.idEstadoMesociclo === 1;
   }
+  esValido(): boolean {
+    return (
+      !!this.objetivo &&
+      !!this.organizacion &&
+      !!this.sesionesPorSemana &&
+      !!this.semanasPorMesociclo &&
+      !!this.principalTrenSuperior &&
+      !!this.principalTrenInferior
+    );
+  }
 
   cancelar(): Mesociclo {
     this.estado = { idEstadoMesociclo: 3, descripcion: "Cancelado" };
     return this;
   }
 
-  async generarSemana() {
+  async generarSemana(): Promise<Sesion[]> {
     // loop over number of sesiones por semana
     // for each sesion, create 3 bloques with random ejercicios
     let _ejercicios = await ejerciciosApi.getEjercicios(PatronesMovimiento.join(","));
@@ -61,8 +72,6 @@ export class Mesociclo {
       ["Rodilla", "Cadera"].includes(e.patron as string)
     );
     let _core = _ejercicios.filter((e) => ["Core"].includes(e.patron as string));
-
-    this.sesiones = [];
 
     let _sesionesSemana = Array.from({ length: this.sesionesPorSemana }, (_v, idx) => {
       let _sesion = new Sesion();
@@ -105,6 +114,24 @@ export class Mesociclo {
     return _sesionesSemana;
   }
 
+  generarSemanaDesdePlantilla(plantilla: Plantilla): Sesion[] {
+    let diffDays = differenceInDays(
+      new Date(),
+      new Date(plantilla.sesiones[0].sesion.fechaEmpezado)
+    );
+
+    const diffWeeks = isAfter(new Date(), new Date(plantilla.sesiones[0].sesion.fechaEmpezado))
+      ? Math.ceil(diffDays / 7)
+      : Math.floor(diffDays / 7);
+
+    return plantilla.sesiones.map((s) =>
+      plainToClass(Sesion, {
+        ...s.sesion,
+        fechaEmpezado: addWeeks(parseISO(s.sesion.fechaEmpezado.toString()), diffWeeks),
+      })
+    );
+  }
+
   generarSesiones(semana: Sesion[]) {
     let _sesiones = Array.from({ length: this.semanasPorMesociclo }, (s, idx) => {
       let _semana = semana.map((s) => {
@@ -122,7 +149,14 @@ export class Mesociclo {
   }
 
   static copiarDe(mesociclo: Mesociclo) {
-    let diffWeeks = differenceInWeeks(new Date(), mesociclo.getFechaInicio());
+    console.log(mesociclo.getFechaInicio());
+    let diffDays = differenceInDays(new Date(), mesociclo.getFechaInicio());
+    const diffWeeks = isAfter(new Date(), mesociclo.getFechaInicio())
+      ? Math.ceil(diffDays / 7)
+      : Math.floor(diffDays / 7);
+
+    console.log(diffDays, diffWeeks);
+
     let _mesociclo = { ...mesociclo };
     _mesociclo.sesiones = mesociclo.sesiones.map((s) => {
       return plainToClass(Sesion, {

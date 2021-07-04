@@ -74,7 +74,5 @@ export const usePlantillas = () => {
     }
   );
 
-  console.log(data.data);
-
   return { ...data, updatePlantillaMutation, createPlantillaMutation, deletePlantillaMutation };
 };

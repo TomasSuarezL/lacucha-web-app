@@ -1,6 +1,7 @@
-import { Flex, Spacer, VStack, Spinner, Text, Button } from "@chakra-ui/react";
+import { Flex, Spacer, VStack, Spinner, Text, Button, Heading } from "@chakra-ui/react";
 import { plainToClass } from "class-transformer";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { usePlantillas } from "../../hooks/usePlantillas";
 import { Ejercicio } from "../../models/Ejercicio";
 import {
   Mesociclo,
@@ -9,9 +10,15 @@ import {
   Organizacion,
   Organizaciones,
 } from "../../models/Mesociclo";
+import { Plantilla } from "../../models/Plantilla";
 import { Sesion } from "../../models/Sesion";
 import { SaveButton } from "../shared/Buttons";
-import { RadioCardsLabeled, NumberInputLabeled, EjercicioSelectLabeled } from "../shared/Inputs";
+import {
+  RadioCardsLabeled,
+  NumberInputLabeled,
+  EjercicioSelectLabeled,
+  SelectLabeled,
+} from "../shared/Inputs";
 import { SesionesTable } from "./SesionTable";
 
 export interface MesocicloNuevoFormProps {
@@ -31,8 +38,10 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
   onClickSesion,
   onSave,
 }) => {
+  const { data: plantillas, isLoading, error, isError } = usePlantillas();
   const [formValido, setFormValido] = useState<Boolean>(true);
   const [loadingSesiones, setLoadingSesiones] = useState<Boolean>(false);
+  const [selectedPlantilla, setSelectedPlantilla] = useState<Plantilla | null>(null);
 
   const onMesocicloChange = (
     key: string,
@@ -42,15 +51,9 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
   };
 
   const onMesocicloSemanaGenerar = async () => {
-    if (
-      mesociclo.objetivo &&
-      mesociclo.organizacion &&
-      mesociclo.sesionesPorSemana &&
-      mesociclo.semanasPorMesociclo &&
-      mesociclo.principalTrenSuperior &&
-      mesociclo.principalTrenInferior
-    ) {
-      // Crear meso
+    if (mesociclo.esValido()) {
+      // Crear las sesiones de una semana (que despues se van a repetir durante el mesociclo)
+      // Por ahora se crean con ejercicios random
       setLoadingSesiones(true);
       let _semana = await mesociclo.generarSemana();
       semana && setMesociclo(plainToClass(Mesociclo, { ...mesociclo, sesiones: null }));
@@ -67,13 +70,37 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
     setMesociclo(plainToClass(Mesociclo, { ...mesociclo, sesiones: _sesiones }));
   };
 
-  return (
+  const onChangePlantilla = (ev) => {
+    const _plantilla = plantillas.filter((p) => p.idPlantilla.toString() === ev.target.value)[0];
+    setSelectedPlantilla(_plantilla);
+    setMesociclo(
+      plainToClass(Mesociclo, {
+        ...mesociclo,
+        ..._plantilla,
+        sesiones: null,
+      })
+    );
+    _plantilla && setSemana(mesociclo.generarSemanaDesdePlantilla(_plantilla));
+  };
+
+  return !isLoading ? (
     <Flex direction="column">
-      <Text fontSize={["xl", "2xl"]} mx={[2]}>
+      <Heading as="h4" fontSize={["xl", "2xl"]} mx={[2]}>
         Nuevo Mesociclo
-      </Text>
+      </Heading>
       <Spacer p={[1, 2]} />
       <VStack m={[1, 2]} spacing={[1, 2, 3]} align="start">
+        <SelectLabeled
+          label={"Plantilla"}
+          value={selectedPlantilla?.idPlantilla || 0}
+          onChange={onChangePlantilla}
+          options={plantillas.map((p) => ({
+            key: p.idPlantilla,
+            value: p.idPlantilla,
+            description: p.nombre,
+          }))}
+          defaultOption={"Ninguna"}
+        />
         <RadioCardsLabeled
           label={"Objetivo"}
           options={Objetivos.map((o) => o.descripcion)}
@@ -94,18 +121,18 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
         />
         <Flex direction={["column", "row"]}>
           <NumberInputLabeled
-            label="Semanas por Mesociclo"
-            value={mesociclo.semanasPorMesociclo}
-            onChangeNumber={(_s, v) => onMesocicloChange("semanasPorMesociclo", v)}
+            label="Sesiones por Semana"
+            value={mesociclo.sesionesPorSemana}
+            onChangeNumber={(_s, v) => onMesocicloChange("sesionesPorSemana", v)}
             step={1}
             maxWidth={["10rem", "15rem"]}
             min={0}
           />
           <Spacer p={[1, 2]} />
           <NumberInputLabeled
-            label="Sesiones por Semana"
-            value={mesociclo.sesionesPorSemana}
-            onChangeNumber={(_s, v) => onMesocicloChange("sesionesPorSemana", v)}
+            label="Semanas por Mesociclo"
+            value={mesociclo.semanasPorMesociclo}
+            onChangeNumber={(_s, v) => onMesocicloChange("semanasPorMesociclo", v)}
             step={1}
             maxWidth={["10rem", "15rem"]}
             min={0}
@@ -137,8 +164,9 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
       ) : (
         <Flex direction="column">
           <Flex direction="row" align="center">
+            <Text>Generar Semana: </Text>
             <Button onClick={() => onMesocicloSemanaGenerar()} size="sm" m={[1, 2]}>
-              {semana ? "Recrear Semana" : "Crear Semana"}
+              {"Aleatoria"}
             </Button>
             {!formValido && <Text>Uno o mas campos son incorrectos.</Text>}
           </Flex>
@@ -150,13 +178,15 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
               <Spacer p={[1, 2]} />
               <SesionesTable sesiones={mesociclo.sesiones} setSesion={() => {}} />
               <Spacer p={[2]} />
-              <SaveButton onClick={onSave}>Crear Mesociclo</SaveButton>
+              <SaveButton onClick={onSave} disabled={!mesociclo.esValido()}>
+                Crear Mesociclo
+              </SaveButton>
             </Flex>
           ) : (
             semana && (
               <Flex my={[2, 3]} direction="column">
                 <Text fontSize={["lg", "xl"]} mx={[2, 2, 4]} alignSelf="flex-start">
-                  Sesiones
+                  Sesiones por Semana
                 </Text>
                 <Spacer p={[1, 2]} />
                 <SesionesTable
@@ -164,12 +194,19 @@ export const MesocicloNuevoForm: React.FC<MesocicloNuevoFormProps> = ({
                   setSesion={(sesion: Sesion) => onClickSesion(sesion)}
                 />
                 <Spacer p={[2]} />
-                <SaveButton onClick={() => onMesocicloSesionesGenerar()}>Crear Sesiones</SaveButton>
+                <SaveButton
+                  onClick={() => onMesocicloSesionesGenerar()}
+                  disabled={!mesociclo.sesionesPorSemana || !mesociclo.semanasPorMesociclo}
+                >
+                  Crear Sesiones
+                </SaveButton>
               </Flex>
             )
           )}
         </Flex>
       )}
     </Flex>
+  ) : (
+    <Spinner alignSelf="center" />
   );
 };

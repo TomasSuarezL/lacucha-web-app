@@ -1,5 +1,4 @@
-import { CloseButton, Flex, Heading, Spacer, Spinner } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import { Flex, Heading } from "@chakra-ui/react";
 import React from "react";
 import ConfiguracionLayout from "../../../components/configuracion/ConfiguracionLayout";
 import { PlantillaForm } from "../../../components/configuracion/plantillas/PlantillaForm";
@@ -7,7 +6,6 @@ import { usePlantillas } from "../../../hooks/usePlantillas";
 import { Plantilla } from "../../../models/Plantilla";
 
 export default function NuevaPlantillaPage() {
-  const router = useRouter();
   const { createPlantillaMutation } = usePlantillas();
 
   return (
@@ -18,8 +16,6 @@ export default function NuevaPlantillaPage() {
             <Heading as="h4" fontSize={["xl", "2xl"]}>
               Nueva Plantilla
             </Heading>
-            <Spacer />
-            <CloseButton onClick={() => router.back()} />
           </Flex>
           <PlantillaForm
             onSubmitForm={(plantilla: Plantilla) => createPlantillaMutation.mutate(plantilla)}

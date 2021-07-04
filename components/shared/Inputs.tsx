@@ -128,12 +128,11 @@ export const NumberInputLabeled = ({
           </NumberInputStepper>
         </NumberInput>
       </Flex>
-      {value === undefined ||
-        (value === null && (
-          <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
-            Valor inválido
-          </Text>
-        ))}
+      {(value === undefined || value === null) && (
+        <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
+          Valor inválido
+        </Text>
+      )}
       {error && (
         <Text fontSize={["xs", "sm"]} fontWeight="light" m={[1, 1]} color="red.500">
           {error}
@@ -214,7 +213,7 @@ export const SelectLabeled: React.FC<SelectLabeledProps> = ({
         {...props}
       >
         {defaultOption && (
-          <option key="0" value="0" selected>
+          <option key="0" value="0">
             {defaultOption}
           </option>
         )}
